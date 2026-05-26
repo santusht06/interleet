@@ -1,5 +1,5 @@
 from redis import Redis
-from core.config import REDIS_PORT, REDIS_HOST
+from app.core.config import REDIS_PORT, REDIS_HOST
 
 
 Redis_client = Redis(

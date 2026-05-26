@@ -2,7 +2,7 @@ import json
 import uuid
 import hashlib
 from fastapi import HTTPException
-from lib.redis import Redis_client
+from app.lib.redis import Redis_client
 
 
 def hashOTP(OTP: str) -> str:

@@ -13,6 +13,9 @@ MONGO_URI = os.getenv("MONGO_URI")
 DB_NAME = os.getenv("DB_NAME")
 
 
+SESSION_SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
+
+
 # REDIS CONFIGURATION
 
 REDIS_HOST = os.getenv("REDIS_HOST", None)

@@ -14,6 +14,8 @@ from app.controllers.user import (
 from app.utils.JWT import (
     check_token,
 )
+from app.middleware.user import Middleware as User_Middleware
+
 
 router = APIRouter(
     prefix="/auth",
@@ -72,7 +74,5 @@ async def github_callback(
 
 
 @router.post("/logout")
-async def logout(
-    response: Response,
-):
+async def logout(response: Response, _: None = Depends(User_Middleware.me)):
     return await UserController.logout(response)

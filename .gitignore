@@ -3,9 +3,13 @@
 __pycache__
 *.pyc
 
+# Google OAuth secrets
+google.json
+*.google.json
+
 # JWT Keys
 *.pem
+
 # OR specifically
 app/core/security/private.pem
 app/core/security/public.pem
-

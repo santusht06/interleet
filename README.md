@@ -1,73 +1,120 @@
-# InterLeet 🚀
+<div align="center">
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
-[![Node.js 18+](https://img.shields.io/badge/node-18+-green.svg)](https://nodejs.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
-[![React 19](https://img.shields.io/badge/React-19-61DAFB.svg)](https://react.dev/)
+<img src="https://img.shields.io/badge/-InterLeet-000000?style=for-the-badge&labelColor=000000&color=E55B04&logoColor=E55B04" height="90" alt="InterLeet banner"/>
+
+# 🚀 InterLeet
+
+### *AI-Powered Interview Preparation & Coding Challenge Platform*
+
+<img src="https://img.shields.io/badge/●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●-000000?style=flat-square&color=E55B04" height="4" alt="divider"/>
+
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-E55B04?style=for-the-badge&labelColor=000000)](https://opensource.org/licenses/Apache-2.0)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-E55B04?style=for-the-badge&labelColor=000000&logo=python&logoColor=E55B04)](https://www.python.org/)
+[![Node.js 18+](https://img.shields.io/badge/Node.js-18+-E55B04?style=for-the-badge&labelColor=000000&logo=nodedotjs&logoColor=E55B04)](https://nodejs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-E55B04?style=for-the-badge&labelColor=000000&logo=fastapi&logoColor=E55B04)](https://fastapi.tiangolo.com/)
+[![React 19](https://img.shields.io/badge/React-19-E55B04?style=for-the-badge&labelColor=000000&logo=react&logoColor=E55B04)](https://react.dev/)
 
 A comprehensive **AI-powered interview preparation and coding challenge platform** that helps developers and job seekers master technical interviews through intelligent mock interviews, coding problems, and system design challenges.
 
----
+</div>
+
+<br/>
+
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📋 Table of Contents
 
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Architecture Overview](#-architecture-overview)
-- [MNC Scalability & Good Practices](#-mnc-scalability--good-practices)
-- [Project Structure](#-project-structure)
-- [Prerequisites](#-prerequisites)
-- [Installation](#-installation)
-- [Environment Setup](#-environment-setup)
-- [Running the Application](#-running-the-application)
-- [Build Instructions](#-build-instructions)
-- [Deployment](#-deployment)
-- [API Overview](#-api-overview)
-- [Authentication Flow](#-authentication-flow)
-- [State Management](#-state-management)
-- [Available Scripts](#-available-scripts)
-- [Key Dependencies](#-key-dependencies)
-- [Development Guide](#-development-guide)
-- [Contribution Guidelines](#-contribution-guidelines)
-- [Roadmap](#-roadmap)
-- [License](#-license)
+<table>
+<tr>
+<td valign="top" width="50%">
 
----
+- [✨ Features](#-features)
+- [🛠 Tech Stack](#-tech-stack)
+- [🏗 Architecture Overview](#-architecture-overview)
+- [📈 MNC Scalability & Good Practices](#-mnc-scalability--good-practices)
+- [📁 Project Structure](#-project-structure)
+- [📦 Prerequisites](#-prerequisites)
+- [🚀 Installation](#-installation)
+- [⚙️ Environment Setup](#️-environment-setup)
+- [🏃 Running the Application](#-running-the-application)
+- [🏗 Build Instructions](#-build-instructions)
+
+</td>
+<td valign="top" width="50%">
+
+- [🚢 Deployment](#-deployment)
+- [🔌 API Overview](#-api-overview)
+- [🔐 Authentication Flow](#-authentication-flow)
+- [🎛 State Management](#-state-management)
+- [📜 Available Scripts](#-available-scripts)
+- [📚 Key Dependencies](#-key-dependencies-explained)
+- [🛠 Development Guide](#-development-guide)
+- [🤝 Contribution Guidelines](#-contribution-guidelines)
+- [🗺 Roadmap](#-roadmap)
+- [📝 License](#-license)
+
+</td>
+</tr>
+</table>
+
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## ✨ Features
 
 ### 🎯 Core Features
 
-| Feature | Description |
-|---------|-------------|
-| **AI-Powered Mock Interviews** | Real-time adaptive interview simulation with LLM-based question generation, evaluation, and feedback |
-| **Coding Challenges** | Extensive problem repository with multiple difficulty levels and domain categories |
-| **System Design Challenges** | Advanced architecture and system design practice problems |
-| **Live Interview Sessions** | WebSocket-based real-time interview experience with streaming responses |
-| **Interview Reports** | Comprehensive performance analysis with topic coverage, evaluation metrics, and improvement areas |
-| **Resume Parser** | Intelligent resume analysis to extract skills, experience, and technologies |
-| **Leaderboard** | Competitive ranking system to track user progress and achievements |
-| **User Profiles** | Detailed profile pages showcasing statistics, achievements, and submission history |
-| **Multi-Auth Support** | Email/OTP, Google OAuth, and GitHub OAuth authentication |
-| **Admin Dashboard** | Administrative tools for platform management and analytics |
-| **Recruiter Portal** | Dedicated interface for recruiters to review candidate profiles and mock interview results |
+<table>
+<tr><th align="left">🔶 Feature</th><th align="left">Description</th></tr>
+<tr><td><b>AI-Powered Mock Interviews</b></td><td>Real-time adaptive interview simulation with LLM-based question generation, evaluation, and feedback</td></tr>
+<tr><td><b>Coding Challenges</b></td><td>Extensive problem repository with multiple difficulty levels and domain categories</td></tr>
+<tr><td><b>System Design Challenges</b></td><td>Advanced architecture and system design practice problems</td></tr>
+<tr><td><b>Live Interview Sessions</b></td><td>WebSocket-based real-time interview experience with streaming responses</td></tr>
+<tr><td><b>Interview Reports</b></td><td>Comprehensive performance analysis with topic coverage, evaluation metrics, and improvement areas</td></tr>
+<tr><td><b>Resume Parser</b></td><td>Intelligent resume analysis to extract skills, experience, and technologies</td></tr>
+<tr><td><b>Leaderboard</b></td><td>Competitive ranking system to track user progress and achievements</td></tr>
+<tr><td><b>User Profiles</b></td><td>Detailed profile pages showcasing statistics, achievements, and submission history</td></tr>
+<tr><td><b>Multi-Auth Support</b></td><td>Email/OTP, Google OAuth, and GitHub OAuth authentication</td></tr>
+<tr><td><b>Admin Dashboard</b></td><td>Administrative tools for platform management and analytics</td></tr>
+<tr><td><b>Recruiter Portal</b></td><td>Dedicated interface for recruiters to review candidate profiles and mock interview results</td></tr>
+</table>
 
 ### 🤖 AI & Interview System
 
-- **Multi-Provider LLM Support**: Seamless integration with multiple AI providers (OpenAI, Anthropic, Google AI, Groq, DeepSeek)
-- **Provider Fallback**: Automatic fallback to secondary AI provider if primary fails
-- **Adaptive Difficulty**: Interview difficulty dynamically adjusts based on candidate performance
-- **Topic Coverage Tracking**: Intelligent system to ensure comprehensive topic coverage during interviews
-- **Real-time Evaluation**: Instant feedback on answers with detailed evaluation criteria
-- **Voice Integration**: Text-to-speech support for interviewer messages (ready for TTS)
-- **Session Persistence**: Interview state persisted with configurable session TTL
+> 🔶 **Multi-Provider LLM Support** — Seamless integration with multiple AI providers (OpenAI, Anthropic, Google AI, Groq, DeepSeek)
+>
+> 🔶 **Provider Fallback** — Automatic fallback to secondary AI provider if primary fails
+>
+> 🔶 **Adaptive Difficulty** — Interview difficulty dynamically adjusts based on candidate performance
+>
+> 🔶 **Topic Coverage Tracking** — Intelligent system to ensure comprehensive topic coverage during interviews
+>
+> 🔶 **Real-time Evaluation** — Instant feedback on answers with detailed evaluation criteria
+>
+> 🔶 **Voice Integration** — Text-to-speech support for interviewer messages (ready for TTS)
+>
+> 🔶 **Session Persistence** — Interview state persisted with configurable session TTL
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🛠 Tech Stack
 
-### Frontend
+<table>
+<tr>
+<td valign="top" width="50%">
+
+### 🖥️ Frontend
 
 ```
 React 19              → Modern reactive UI with hooks
@@ -84,7 +131,10 @@ Lucide Icons         → Beautiful, consistent icon set
 Sonner               → Toast notification system
 ```
 
-### Backend
+</td>
+<td valign="top" width="50%">
+
+### ⚙️ Backend
 
 ```
 FastAPI              → Modern async Python web framework
@@ -98,18 +148,27 @@ Python 3.9+          → Programming language
 Uvicorn              → ASGI web server
 ```
 
-### AI & ML Services
+</td>
+</tr>
+</table>
+
+### 🧠 AI & ML Services
 
 - **LLM Providers**: OpenAI GPT, Anthropic Claude, Google Gemini, Groq, DeepSeek
 - **Provider Management**: Dynamic provider selection with fallback mechanism
 - **Graph-Based State**: Interview state managed through LLM graph architecture
 - **Resume Processing**: Intelligent resume parsing and extraction
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🏗 Architecture Overview
 
-### System Diagram
+<details open>
+<summary><b>🔶 Click to view / collapse the System Diagram</b></summary>
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -153,7 +212,9 @@ Uvicorn              → ASGI web server
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Request Flow
+</details>
+
+### 🔄 Request Flow
 
 1. **User Authentication**: OAuth or email/OTP verification
 2. **Session Creation**: User session established with JWT token
@@ -163,36 +224,49 @@ Uvicorn              → ASGI web server
 6. **Report Generation**: Comprehensive report created upon completion
 7. **State Persistence**: Interview state saved to Redis with MongoDB backup
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📈 MNC Scalability & Good Practices
 
-Designed with production-grade reliability, secure isolation, and decoupled components, InterLeet is architected to align with the core software engineering principles practiced at large-scale technology enterprises (FAANG/MNCs).
+> Designed with production-grade reliability, secure isolation, and decoupled components, InterLeet is architected to align with the core software engineering principles practiced at large-scale technology enterprises (FAANG/MNCs).
 
 ### 🚀 1. Architectural Scalability & System Design
 
 To handle heavy, concurrent user actions without degradation, the backend employs three primary design patterns:
-* **Decoupled Sandbox Isolation (Untrusted Code Execution):** Executing arbitrary user code poses critical security and performance risks. InterLeet isolates execution into ephemeral, resource-constrained **Docker Sandboxes** running as non-root users. The main API thread never compiles or runs code; instead, it delegates tasks, protecting the host system from memory exhaustion (OOM), infinite loops (timeout limits), and malicious system calls.
-* **Asynchronous Task Processing:** Heavily CPU-bound tasks—such as AST parsing for mutation testing and sandbox execution—are processed asynchronously. This prevents thread starvation at the ASGI (Uvicorn) web server level, ensuring the API remains highly responsive for other active users.
-* **Distributed Caching & Real-Time Persistence (Redis + MongoDB):** 
-  * **Redis** acts as a ultra-low-latency state cache for real-time WebSocket interview sessions, OTP management, and rate-limiting.
-  * **MongoDB (Motor Driver)** handles non-blocking async writes for persistent data (user statistics, submissions, interview reports), preventing database lockups under high write volume.
+
+- **Decoupled Sandbox Isolation (Untrusted Code Execution):** Executing arbitrary user code poses critical security and performance risks. InterLeet isolates execution into ephemeral, resource-constrained **Docker Sandboxes** running as non-root users. The main API thread never compiles or runs code; instead, it delegates tasks, protecting the host system from memory exhaustion (OOM), infinite loops (timeout limits), and malicious system calls.
+- **Asynchronous Task Processing:** Heavily CPU-bound tasks — such as AST parsing for mutation testing and sandbox execution — are processed asynchronously. This prevents thread starvation at the ASGI (Uvicorn) web server level, ensuring the API remains highly responsive for other active users.
+- **Distributed Caching & Real-Time Persistence (Redis + MongoDB):**
+  - **Redis** acts as an ultra-low-latency state cache for real-time WebSocket interview sessions, OTP management, and rate-limiting.
+  - **MongoDB (Motor Driver)** handles non-blocking async writes for persistent data (user statistics, submissions, interview reports), preventing database lockups under high write volume.
 
 ### 🛡️ 2. Production-Grade Good Practices & Code Quality
 
 Large-scale engineering demands automated quality control. The project implements advanced testing and security safeguards:
-* **Automated Challenge Validation Framework (Quality Gate):** Before any coding challenge is published, it must pass a strict three-layer validation pipeline:
-  * **AST-Based Mutation Testing:** Programmatically synthesizes mutant solutions (e.g. replacing constants, removing statements, hardcoding outputs) to verify if the test suite successfully fails them (preventing weak test cases).
-  * **Differential Testing:** Automatically tests user submissions against pre-verified reference solutions in parallel.
-  * **Coverage Analysis:** Traces statement and branch coverage inside the sandboxes to ensure test inputs cover all logical execution paths.
-* **Zero-Trust Security & Modern Auth:** 
-  * **WebAuthn (Passkeys):** Integrated hardware-bound passwordless authentication (biometrics/FIDO2 keys), mitigating phishing and credential stuffing attacks.
-  * **JWT Session Protection:** Stateless authentication tokens with strict signature validation, enabling seamless scaling across stateless load-balanced backend instances.
-* **Decoupled UI State Management:** The frontend uses **Redux Toolkit** to strictly decouple API state from components. Page transitions are snappy, client-side caching prevents redundant network requests, and visual performance remains optimal.
 
----
+- **Automated Challenge Validation Framework (Quality Gate):** Before any coding challenge is published, it must pass a strict three-layer validation pipeline:
+  - **AST-Based Mutation Testing:** Programmatically synthesizes mutant solutions (e.g. replacing constants, removing statements, hardcoding outputs) to verify if the test suite successfully fails them (preventing weak test cases).
+  - **Differential Testing:** Automatically tests user submissions against pre-verified reference solutions in parallel.
+  - **Coverage Analysis:** Traces statement and branch coverage inside the sandboxes to ensure test inputs cover all logical execution paths.
+- **Zero-Trust Security & Modern Auth:**
+  - **WebAuthn (Passkeys):** Integrated hardware-bound passwordless authentication (biometrics/FIDO2 keys), mitigating phishing and credential stuffing attacks.
+  - **JWT Session Protection:** Stateless authentication tokens with strict signature validation, enabling seamless scaling across stateless load-balanced backend instances.
+- **Decoupled UI State Management:** The frontend uses **Redux Toolkit** to strictly decouple API state from components. Page transitions are snappy, client-side caching prevents redundant network requests, and visual performance remains optimal.
+
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📁 Project Structure
+
+<details>
+<summary><b>🔶 Click to expand the full directory tree</b></summary>
 
 ```
 interleet/
@@ -330,7 +404,9 @@ interleet/
 └── README.md                          # Project documentation (this file)
 ```
 
-### Key Directory Functions
+</details>
+
+### 🔑 Key Directory Functions
 
 | Directory | Purpose |
 |-----------|---------|
@@ -341,19 +417,25 @@ interleet/
 | `backend/app/models` | MongoDB data models and schemas |
 | `backend/app/routers` | FastAPI route handlers and endpoints |
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📦 Prerequisites
 
-### System Requirements
+### 💻 System Requirements
 
-- **Node.js**: 18+ (with npm 9+)
-- **Python**: 3.9+ (with pip)
-- **MongoDB**: 4.4+ (local or cloud instance like MongoDB Atlas)
-- **Redis**: 6+ (optional, for session caching)
-- **Git**: For version control
+| Requirement | Version |
+|---|---|
+| **Node.js** | 18+ (with npm 9+) |
+| **Python** | 3.9+ (with pip) |
+| **MongoDB** | 4.4+ (local or cloud instance like MongoDB Atlas) |
+| **Redis** | 6+ (optional, for session caching) |
+| **Git** | For version control |
 
-### API Keys & Credentials Required
+### 🔑 API Keys & Credentials Required
 
 ```
 GOOGLE_CLIENT_ID                 # Google OAuth credentials
@@ -374,18 +456,22 @@ REDIS_HOST                       # Redis host (optional)
 REDIS_PORT                       # Redis port (optional)
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🚀 Installation
 
-### 1. Clone Repository
+### 1️⃣ Clone Repository
 
 ```bash
 git clone https://github.com/santusht06/interleet.git
 cd interleet
 ```
 
-### 2. Backend Setup
+### 2️⃣ Backend Setup
 
 ```bash
 # Navigate to backend
@@ -406,7 +492,7 @@ pip install -r requirements.txt
 # pip install fastapi uvicorn motor pydantic authlib python-dotenv langchain
 ```
 
-### 3. Frontend Setup
+### 3️⃣ Frontend Setup
 
 ```bash
 # Navigate to frontend
@@ -416,11 +502,15 @@ cd ../frontend
 npm install
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## ⚙️ Environment Setup
 
-### Backend Environment Variables
+### 🔧 Backend Environment Variables
 
 Create a `.env` file in the `backend/` directory:
 
@@ -474,7 +564,7 @@ AI_MAX_RETRIES=2
 INTERVIEW_SESSION_TTL_SECONDS=21600  # 6 hours
 ```
 
-### Frontend Environment Variables
+### 🎨 Frontend Environment Variables
 
 Create a `.env` file in the `frontend/` directory (optional for development):
 
@@ -483,11 +573,15 @@ VITE_API_BASE_URL=http://localhost:8000
 VITE_APP_NAME=InterLeet
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🏃 Running the Application
 
-### Option 1: Run Backend Only
+### Option 1 — Run Backend Only
 
 ```bash
 cd backend
@@ -495,20 +589,19 @@ source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 python main.py
 ```
 
-Backend will start at: `http://localhost:8000`
+> 🔶 Backend will start at: `http://localhost:8000`
+> API documentation: `http://localhost:8000/docs` (Swagger UI)
 
-API documentation: `http://localhost:8000/docs` (Swagger UI)
-
-### Option 2: Run Frontend Only
+### Option 2 — Run Frontend Only
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Frontend will start at: `http://localhost:5173`
+> 🔶 Frontend will start at: `http://localhost:5173`
 
-### Option 3: Run Both (Recommended Development Setup)
+### Option 3 — Run Both (Recommended Development Setup)
 
 **Terminal 1 - Backend:**
 ```bash
@@ -523,9 +616,9 @@ cd frontend
 npm run dev
 ```
 
-Access the application at: `http://localhost:5173`
+> 🔶 Access the application at: `http://localhost:5173`
 
-### Health Checks
+### ✅ Health Checks
 
 ```bash
 # Check backend health
@@ -538,11 +631,15 @@ open http://localhost:8000/docs
 open http://localhost:5173
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🏗 Build Instructions
 
-### Frontend Build
+### 🖥️ Frontend Build
 
 ```bash
 cd frontend
@@ -557,7 +654,7 @@ npm run build
 npm run preview
 ```
 
-### Backend Build
+### ⚙️ Backend Build
 
 FastAPI doesn't require compilation. For production deployment:
 
@@ -571,11 +668,15 @@ pip install -r requirements.txt --only-binary :all:
 gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🚢 Deployment
 
-### Frontend Deployment (Vercel/Netlify)
+### 🌐 Frontend Deployment (Vercel/Netlify)
 
 ```bash
 cd frontend
@@ -590,7 +691,7 @@ vercel deploy --prod
 netlify deploy --prod --dir=dist
 ```
 
-### Backend Deployment (Heroku/Railway/Render)
+### 🖧 Backend Deployment (Heroku/Railway/Render)
 
 ```bash
 cd backend
@@ -606,9 +707,11 @@ heroku create interleet-api
 git push heroku main
 ```
 
-### Docker Deployment (Optional)
+### 🐳 Docker Deployment (Optional)
 
-**Frontend Dockerfile:**
+<details>
+<summary><b>🔶 Frontend Dockerfile</b></summary>
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -620,7 +723,11 @@ EXPOSE 3000
 CMD ["npm", "run", "preview"]
 ```
 
-**Backend Dockerfile:**
+</details>
+
+<details>
+<summary><b>🔶 Backend Dockerfile</b></summary>
+
 ```dockerfile
 FROM python:3.11-slim
 WORKDIR /app
@@ -631,11 +738,17 @@ EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 ```
 
----
+</details>
+
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🔌 API Overview
 
-### Interview Endpoints
+### 🎙️ Interview Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -644,7 +757,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 | `GET` | `/interview/{session_id}` | Retrieve interview session state |
 | `GET` | `/interview/{session_id}/report` | Get interview report after completion |
 
-### Authentication Endpoints
+### 🔐 Authentication Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -656,15 +769,17 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 | `GET` | `/auth/github/callback` | GitHub OAuth callback |
 | `POST` | `/auth/logout` | Logout user |
 
-### Resume Endpoints
+### 📄 Resume Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/resume/parse` | Parse and extract resume data |
 
-### Request/Response Examples
+### 📤 Request/Response Examples
 
-**Start Interview:**
+<details>
+<summary><b>🔶 Start Interview</b></summary>
+
 ```bash
 curl -X POST http://localhost:8000/interview/start \
   -H "Content-Type: application/json" \
@@ -679,7 +794,11 @@ curl -X POST http://localhost:8000/interview/start \
   }'
 ```
 
-**Answer Question:**
+</details>
+
+<details>
+<summary><b>🔶 Answer Question</b></summary>
+
 ```bash
 curl -X POST http://localhost:8000/interview/answer \
   -H "Content-Type: application/json" \
@@ -690,11 +809,17 @@ curl -X POST http://localhost:8000/interview/answer \
   }'
 ```
 
----
+</details>
+
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🔐 Authentication Flow
 
-### Diagram
+### 🗺️ Diagram
 
 ```
 User → Login Page
@@ -725,7 +850,7 @@ JWT Token in Cookie/localStorage
 Authenticated User Access
 ```
 
-### Security Features
+### 🛡️ Security Features
 
 - **JWT Tokens**: Stateless authentication with expiration (default 7 days)
 - **Session Middleware**: Secure session management with secrets
@@ -733,11 +858,15 @@ Authenticated User Access
 - **OTP Verification**: Email-based one-time password for registration
 - **Token Dependency**: Protected routes require valid JWT token
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🎛 State Management
 
-### Redux Store Structure
+### 🗂️ Redux Store Structure
 
 ```javascript
 store: {
@@ -780,7 +909,7 @@ store: {
 }
 ```
 
-### Redux Slices
+### 🍰 Redux Slices
 
 Each domain has a dedicated Redux slice:
 
@@ -794,7 +923,7 @@ Each domain has a dedicated Redux slice:
 | `systemDesignSlice` | System design problems | FETCH_CHALLENGES, SUBMIT_SOLUTION |
 | `candidatesSlice` | Candidate profiles (recruiter) | FETCH_CANDIDATES, VIEW_PROFILE |
 
-### Data Flow
+### 🔁 Data Flow
 
 ```
 User Action (UI Event)
@@ -808,11 +937,15 @@ Component Re-renders
 Updated UI
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📜 Available Scripts
 
-### Frontend Scripts
+### 🖥️ Frontend Scripts
 
 ```bash
 npm run dev         # Start development server (Vite)
@@ -821,7 +954,7 @@ npm run preview     # Preview production build locally
 npm run lint        # Run ESLint on source files
 ```
 
-### Backend Scripts
+### ⚙️ Backend Scripts
 
 ```bash
 # Start development server
@@ -837,11 +970,15 @@ gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker
 pytest tests/ -v
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📚 Key Dependencies Explained
 
-### Frontend Dependencies
+### 🖥️ Frontend Dependencies
 
 | Package | Version | Purpose |
 |---------|---------|---------|
@@ -858,7 +995,7 @@ pytest tests/ -v
 | **Sonner** | 2.0 | Toast notifications |
 | **Vite** | 7.0 | Build tool |
 
-### Backend Dependencies
+### ⚙️ Backend Dependencies
 
 ```
 fastapi               # Web framework
@@ -871,7 +1008,7 @@ python-dotenv        # Environment variables
 requests             # HTTP client
 ```
 
-### Why These Choices?
+### 🤔 Why These Choices?
 
 | Technology | Reason |
 |------------|--------|
@@ -882,11 +1019,15 @@ requests             # HTTP client
 | **Motor** | Seamless async MongoDB integration for non-blocking I/O |
 | **LangChain** | Unified LLM interface, easy provider switching |
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🛠 Development Guide
 
-### Adding a New Feature
+### ➕ Adding a New Feature
 
 1. **Backend**:
    - Add data model in `backend/app/models/`
@@ -900,9 +1041,11 @@ requests             # HTTP client
    - Add UI components using Radix UI + Tailwind
    - Add route in `frontend/src/routes/AppRoutes.jsx`
 
-### Adding a New API Endpoint
+### 🔌 Adding a New API Endpoint
 
-**Backend Example:**
+<details>
+<summary><b>🔶 Backend Example</b></summary>
+
 ```python
 # backend/app/routers/new_router.py
 from fastapi import APIRouter
@@ -918,7 +1061,11 @@ async def perform_action(payload: dict):
 app.include_router(new_router)
 ```
 
-**Frontend Example:**
+</details>
+
+<details>
+<summary><b>🔶 Frontend Example</b></summary>
+
 ```javascript
 // frontend/src/redux/slices/newFeatureSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
@@ -947,7 +1094,9 @@ const newFeatureSlice = createSlice({
 export default newFeatureSlice.reducer;
 ```
 
-### Running Tests
+</details>
+
+### 🧪 Running Tests
 
 ```bash
 # Backend tests (when available)
@@ -959,7 +1108,7 @@ cd frontend
 npm run test
 ```
 
-### Code Style & Linting
+### 🎨 Code Style & Linting
 
 ```bash
 # Frontend linting
@@ -973,11 +1122,15 @@ black .
 flake8 app/
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🤝 Contribution Guidelines
 
-### How to Contribute
+### 🔶 How to Contribute
 
 1. **Fork** the repository
 2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
@@ -985,7 +1138,7 @@ flake8 app/
 4. **Push** to branch (`git push origin feature/amazing-feature`)
 5. **Open** a Pull Request
 
-### Code Standards
+### 📏 Code Standards
 
 - **Frontend**: Follow React best practices, use functional components with hooks
 - **Backend**: Follow PEP 8 Python conventions, use type hints
@@ -993,7 +1146,7 @@ flake8 app/
 - **Testing**: Add tests for new features
 - **Documentation**: Update README and code comments
 
-### Issue Reporting
+### 🐛 Issue Reporting
 
 Include:
 - Clear description of the issue
@@ -1002,7 +1155,11 @@ Include:
 - Screenshots if UI-related
 - Environment details (OS, Node/Python version)
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🗺 Roadmap
 
@@ -1012,7 +1169,7 @@ Include:
 - [x] AI mock interviews
 - [x] Basic leaderboard
 
-### Phase 2: Advanced Features (In Progress)
+### Phase 2: Advanced Features (In Progress) 🔶
 - [ ] System design interviews with whiteboarding
 - [ ] Video interview recording and playback
 - [ ] Real-time collaborative coding
@@ -1033,7 +1190,11 @@ Include:
 - [ ] Interview coaching with ML feedback
 - [ ] Behavioral interview simulations
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📝 License
 
@@ -1055,27 +1216,35 @@ The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 ```
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🙋 Support & Community
 
-### Getting Help
+### 🔶 Getting Help
 
 - **Documentation**: Check this README and code comments
 - **Issues**: File GitHub issues for bugs and feature requests
 - **Discussions**: Use GitHub Discussions for questions
 - **Email**: contact@interleet.dev
 
-### Connected Resources
+### 🔗 Connected Resources
 
 | Resource | Link |
 |----------|------|
 | **API Docs** | `http://localhost:8000/docs` |
 | **GitHub** | [santusht06/interleet](https://github.com/santusht06/interleet) |
 | **Issue Tracker** | GitHub Issues |
-| **Demo** | [interleet.dev](https://interleet.dev) |
+| **Try Our Product** | [Interleet](https://interleet.sharexpress.in/) |
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🙏 Acknowledgments
 
@@ -1084,18 +1253,25 @@ copies or substantial portions of the Software.
 - **LangChain** for LLM abstraction
 - All **contributors** and **users** who make this project possible
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 📊 Project Statistics
 
-- **Lines of Code**: ~15,000+
-- **Frontend Components**: 50+
-- **API Endpoints**: 15+
-- **Database Collections**: 13
-- **Supported AI Providers**: 5
+<table>
+<tr><td align="center"><b>15,000+</b><br/>Lines of Code</td><td align="center"><b>50+</b><br/>Frontend Components</td><td align="center"><b>15+</b><br/>API Endpoints</td><td align="center"><b>13</b><br/>DB Collections</td><td align="center"><b>5</b><br/>AI Providers</td></tr>
+</table>
+
 - **Languages Supported**: Python, JavaScript, TypeScript
 
----
+<div align="center">
+
+███████████████████████████████████████████████████████████████████
+
+</div>
 
 ## 🔄 Version History
 
@@ -1105,8 +1281,14 @@ copies or substantial portions of the Software.
 | v0.2.0 (In Dev) | 2024 Q2 | System design, advanced analytics |
 | v0.3.0 (Planned) | 2024 Q3 | Video interviews, recruiter CRM |
 
----
+<div align="center">
 
-**Last Updated**: June 2024  
-**Status**: Active Development  
-**Maintained By**: InterLeet Team
+███████████████████████████████████████████████████████████████████
+
+<br/>
+
+<img src="https://img.shields.io/badge/Last%20Updated-June%202024-000000?style=for-the-badge&labelColor=E55B04&logoColor=white"/>
+<img src="https://img.shields.io/badge/Status-Active%20Development-000000?style=for-the-badge&labelColor=E55B04&logoColor=white"/>
+<img src="https://img.shields.io/badge/Maintained%20By-InterLeet%20Team-000000?style=for-the-badge&labelColor=E55B04&logoColor=white"/>
+
+</div>

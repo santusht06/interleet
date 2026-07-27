@@ -1,20 +1,23 @@
 <div align="center">
 
-<img src="https://img.shields.io/badge/-InterLeet-000000?style=for-the-badge&labelColor=000000&color=E55B04&logoColor=E55B04" height="90" alt="InterLeet banner"/>
-
-# 🚀 InterLeet
+<a href="https://interleet.sharexpress.in/">
+  <img src="https://github.com/UnboundSB/interleet.sharexpress.in/blob/main/frontend/src/assets/logo.png?raw=true" height="160" alt="InterLeet logo"/>
+</a>
 
 ### *AI-Powered Interview Preparation & Coding Challenge Platform*
 
 <img src="https://img.shields.io/badge/●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●-000000?style=flat-square&color=E55B04" height="4" alt="divider"/>
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-E55B04?style=for-the-badge&labelColor=000000)](https://opensource.org/licenses/Apache-2.0)
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-interleet.sharexpress.in-E55B04?style=for-the-badge&labelColor=000000)](https://interleet.sharexpress.in/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-E55B04?style=for-the-badge&labelColor=000000)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Python 3.9+](https://img.shields.io/badge/Python-3.9+-E55B04?style=for-the-badge&labelColor=000000&logo=python&logoColor=E55B04)](https://www.python.org/)
 [![Node.js 18+](https://img.shields.io/badge/Node.js-18+-E55B04?style=for-the-badge&labelColor=000000&logo=nodedotjs&logoColor=E55B04)](https://nodejs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-E55B04?style=for-the-badge&labelColor=000000&logo=fastapi&logoColor=E55B04)](https://fastapi.tiangolo.com/)
 [![React 19](https://img.shields.io/badge/React-19-E55B04?style=for-the-badge&labelColor=000000&logo=react&logoColor=E55B04)](https://react.dev/)
 
 A comprehensive **AI-powered interview preparation and coding challenge platform** that helps developers and job seekers master technical interviews through intelligent mock interviews, coding problems, and system design challenges.
+
+**🟢 Live in production at [interleet.sharexpress.in](https://interleet.sharexpress.in/)**
 
 </div>
 
@@ -167,54 +170,99 @@ Uvicorn              → ASGI web server
 
 ## 🏗 Architecture Overview
 
-<details open>
-<summary><b>🔶 Click to view / collapse the System Diagram</b></summary>
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#E55B04',
+  'primaryTextColor': '#ffffff',
+  'primaryBorderColor': '#000000',
+  'lineColor': '#E55B04',
+  'secondaryColor': '#000000',
+  'tertiaryColor': '#1a1a1a',
+  'background': '#000000',
+  'mainBkg': '#E55B04',
+  'clusterBkg': '#1a1a1a',
+  'clusterBorder': '#E55B04',
+  'fontFamily': 'monospace'
+}}}%%
+flowchart TB
+    subgraph FE["🖥️ Frontend — React + Redux"]
+        direction LR
+        F1["Challenges<br/>System Design<br/>Profiles"]
+        F2["Dashboard<br/>Leaderboard<br/>Analytics"]
+        F3["AI Interviews<br/>Live Sessions<br/>Reports"]
+        FS[("Redux Store<br/>User · Challenges · Interviews · Activity · System")]
+        F1 & F2 & F3 --> FS
+    end
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Frontend (React + Redux)               │
-│  ┌──────────────────┬──────────────┬──────────────────┐   │
-│  │   Challenges     │  Dashboard   │  AI Interviews   │   │
-│  │   System Design  │  Leaderboard │  Live Sessions   │   │
-│  │   Profiles       │  Analytics   │  Reports         │   │
-│  └──────────────────┴──────────────┴──────────────────┘   │
-│                         (Redux Store)                      │
-│  ┌──────────────────────────────────────────────────────┐  │
-│  │ User | Challenges | Interviews | Activity | System  │  │
-│  └──────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                              ↕️ HTTP/WebSocket
-┌─────────────────────────────────────────────────────────────┐
-│                  Backend (FastAPI + Async)                 │
-│  ┌──────────────────┬──────────────┬──────────────────┐   │
-│  │   Auth Router    │  Resume      │ Interview        │   │
-│  │   (JWT + OAuth)  │  Parser      │ Handler          │   │
-│  │   Google/GitHub  │              │ (WebSocket)      │   │
-│  └──────────────────┴──────────────┴──────────────────┘   │
-│                                                             │
-│  ┌────────────────────────────────────────────────────┐   │
-│  │              AI Interview Engine                   │   │
-│  │  ┌──────────────┬──────────────┬────────────────┐ │   │
-│  │  │ Graph-based  │ Multi-LLM    │ Evaluation    │ │   │
-│  │  │ State Mgmt   │ Provider Mgmt│ System        │ │   │
-│  │  │ Interview    │ with Fallback│              │ │   │
-│  │  │ Nodes        │              │              │ │   │
-│  │  └──────────────┴──────────────┴────────────────┘ │   │
-│  └────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────┘
-         ↕️ Async Drivers & Connections
-┌─────────────────────────────────────────────────────────────┐
-│                   Data & Services Layer                     │
-│  ┌──────────────┬──────────────┬──────────────────┐        │
-│  │  MongoDB     │   Redis      │   AI Providers   │        │
-│  │  (persistent)│  (sessions)  │   (LLMs)         │        │
-│  └──────────────┴──────────────┴──────────────────┘        │
-└─────────────────────────────────────────────────────────────┘
-```
+    subgraph BE["⚙️ Backend — FastAPI + Async"]
+        direction TB
+        B1["Auth Router<br/>JWT + OAuth<br/>Google/GitHub"]
+        B2["Resume Parser"]
+        B3["Interview Handler<br/>(WebSocket)"]
+        subgraph AIE["🤖 AI Interview Engine"]
+            direction LR
+            AI1["Graph-based<br/>State Mgmt<br/>Interview Nodes"]
+            AI2["Multi-LLM<br/>Provider Mgmt<br/>with Fallback"]
+            AI3["Evaluation<br/>System"]
+        end
+        B1 & B2 & B3 --> AIE
+    end
 
-</details>
+    subgraph DATA["🗄️ Data & Services Layer"]
+        direction LR
+        D1[("MongoDB<br/>persistent")]
+        D2[("Redis<br/>sessions")]
+        D3["AI Providers<br/>(LLMs)"]
+    end
+
+    FE <-->|"HTTP / WebSocket"| BE
+    BE <-->|"Async Drivers & Connections"| DATA
+
+    classDef orange fill:#E55B04,stroke:#000000,stroke-width:2px,color:#ffffff
+    classDef dark fill:#1a1a1a,stroke:#E55B04,stroke-width:1px,color:#ffffff
+    class F1,F2,F3,FS,B1,B2,B3,AI1,AI2,AI3,D1,D2,D3 dark
+```
 
 ### 🔄 Request Flow
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#E55B04',
+  'primaryTextColor': '#ffffff',
+  'primaryBorderColor': '#000000',
+  'lineColor': '#E55B04',
+  'actorBkg': '#1a1a1a',
+  'actorBorder': '#E55B04',
+  'actorTextColor': '#ffffff',
+  'signalColor': '#E55B04',
+  'signalTextColor': '#ffffff',
+  'noteBkgColor': '#E55B04',
+  'noteTextColor': '#ffffff',
+  'noteBorderColor': '#000000',
+  'background': '#000000',
+  'fontFamily': 'monospace'
+}}}%%
+sequenceDiagram
+    actor U as 👤 User
+    participant Auth as 🔐 Auth Service
+    participant API as ⚙️ FastAPI Backend
+    participant Graph as 🤖 Interview Graph (LLM)
+    participant DB as 🗄️ Redis + MongoDB
+
+    U->>Auth: OAuth / Email-OTP verification
+    Auth-->>U: JWT session created
+    U->>API: Start interview (role, skills, JD)
+    API->>Graph: Execute state graph
+    Graph-->>API: Generated question
+    API-->>U: Stream question
+    U->>API: Submit answer
+    API->>Graph: Evaluate answer
+    Graph-->>API: Feedback + next difficulty
+    API->>DB: Persist interview state
+    Note over API,DB: Repeats until interview completes
+    API->>DB: Generate & store final report
+    API-->>U: Comprehensive report
+```
 
 1. **User Authentication**: OAuth or email/OTP verification
 2. **Session Creation**: User session established with JWT token
@@ -467,8 +515,8 @@ REDIS_PORT                       # Redis port (optional)
 ### 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/santusht06/interleet.git
-cd interleet
+git clone https://github.com/UnboundSB/interleet.sharexpress.in.git
+cd interleet.sharexpress.in
 ```
 
 ### 2️⃣ Backend Setup
@@ -821,33 +869,31 @@ curl -X POST http://localhost:8000/interview/answer \
 
 ### 🗺️ Diagram
 
-```
-User → Login Page
-  ↓
-Choose Auth Method:
-  ├→ Email/OTP
-  │  ├→ Enter Email
-  │  ├→ Send OTP
-  │  ├→ Verify OTP
-  │  └→ Create JWT Session
-  │
-  ├→ Google OAuth
-  │  ├→ Redirect to Google
-  │  ├→ Google Callback
-  │  ├→ Verify Token
-  │  └→ Create Session
-  │
-  └→ GitHub OAuth
-     ├→ Redirect to GitHub
-     ├→ GitHub Callback
-     ├→ Verify Token
-     └→ Create Session
-  ↓
-User Profile Set (from parsed data)
-  ↓
-JWT Token in Cookie/localStorage
-  ↓
-Authenticated User Access
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#E55B04',
+  'primaryTextColor': '#ffffff',
+  'primaryBorderColor': '#000000',
+  'lineColor': '#E55B04',
+  'background': '#000000',
+  'fontFamily': 'monospace'
+}}}%%
+flowchart TD
+    A["👤 User → Login Page"] --> B{Choose Auth Method}
+
+    B -->|Email/OTP| C1["Enter Email"] --> C2["Send OTP"] --> C3["Verify OTP"] --> C4["Create JWT Session"]
+    B -->|Google OAuth| G1["Redirect to Google"] --> G2["Google Callback"] --> G3["Verify Token"] --> G4["Create Session"]
+    B -->|GitHub OAuth| H1["Redirect to GitHub"] --> H2["GitHub Callback"] --> H3["Verify Token"] --> H4["Create Session"]
+
+    C4 & G4 & H4 --> P["🧾 User Profile Set<br/>(from parsed data)"]
+    P --> J["🔑 JWT Token in Cookie / localStorage"]
+    J --> Auth["✅ Authenticated User Access"]
+
+    classDef orange fill:#E55B04,stroke:#000000,stroke-width:2px,color:#ffffff
+    classDef dark fill:#1a1a1a,stroke:#E55B04,stroke-width:1px,color:#ffffff
+    class A,P,J,Auth orange
+    class C1,C2,C3,C4,G1,G2,G3,G4,H1,H2,H3,H4 dark
+    class B dark
 ```
 
 ### 🛡️ Security Features
@@ -925,16 +971,23 @@ Each domain has a dedicated Redux slice:
 
 ### 🔁 Data Flow
 
-```
-User Action (UI Event)
-  ↓
-Redux Action Dispatcher
-  ↓
-Reducer Updates State
-  ↓
-Component Re-renders
-  ↓
-Updated UI
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {
+  'primaryColor': '#E55B04',
+  'primaryTextColor': '#ffffff',
+  'primaryBorderColor': '#000000',
+  'lineColor': '#E55B04',
+  'background': '#000000',
+  'fontFamily': 'monospace'
+}}}%%
+flowchart LR
+    A["🖱️ User Action<br/>(UI Event)"] --> B["📤 Redux Action<br/>Dispatcher"]
+    B --> C["🔄 Reducer Updates<br/>State"]
+    C --> D["🧩 Component<br/>Re-renders"]
+    D --> E["✅ Updated UI"]
+
+    classDef orange fill:#E55B04,stroke:#000000,stroke-width:2px,color:#ffffff
+    class A,B,C,D,E orange
 ```
 
 <div align="center">
@@ -1198,22 +1251,22 @@ Include:
 
 ## 📝 License
 
-This project is licensed under the **MIT License** - see the LICENSE file for details.
+This project is licensed under the **Apache License, Version 2.0** — see the [LICENSE](https://www.apache.org/licenses/LICENSE-2.0) file for full details.
 
 ```
- Copyright 2026 sharexpress
+Copyright 2024 InterLeet Contributors
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```
 
 <div align="center">
@@ -1235,10 +1288,10 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 
 | Resource | Link |
 |----------|------|
-| **API Docs** | `http://localhost:8000/docs` |
-| **GitHub** | [santusht06/interleet](https://github.com/santusht06/interleet) |
+| **Live Product** | [interleet.sharexpress.in](https://interleet.sharexpress.in/) |
+| **API Docs** | `http://localhost:8000/docs` (local dev) |
+| **GitHub** | [UnboundSB/interleet.sharexpress.in](https://github.com/UnboundSB/interleet.sharexpress.in) |
 | **Issue Tracker** | GitHub Issues |
-| **Try Our Product** | [Interleet](https://interleet.sharexpress.in/) |
 
 <div align="center">
 
@@ -1288,7 +1341,7 @@ This project is licensed under the **MIT License** - see the LICENSE file for de
 <br/>
 
 <img src="https://img.shields.io/badge/Last%20Updated-June%202024-000000?style=for-the-badge&labelColor=E55B04&logoColor=white"/>
-<img src="https://img.shields.io/badge/Status-Active%20Development-000000?style=for-the-badge&labelColor=E55B04&logoColor=white"/>
+<img src="https://img.shields.io/badge/Status-🟢_Live_in_Production-000000?style=for-the-badge&labelColor=E55B04&logoColor=white"/>
 <img src="https://img.shields.io/badge/Maintained%20By-InterLeet%20Team-000000?style=for-the-badge&labelColor=E55B04&logoColor=white"/>
 
 </div>

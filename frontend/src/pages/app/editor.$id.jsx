@@ -74,6 +74,7 @@ import EnvironmentInfo from "./editor/EnvironmentInfo";
 import ConsoleOutput from "./editor/ConsoleOutput";
 import { DragHandle, VerticalDragHandle } from "./editor/DragHandles";
 import { BrowserPreview } from "./editor/BrowserPreview";
+import AiAssist from "./editor/AiAssist";
 import {
   LANG_LABEL,
   LANG_BADGE,
@@ -947,6 +948,7 @@ function EditorPage() {
             )}
             Submit
           </Button>
+          <AiAssist slug={slug} code={code} language={lang} />
           <Drawer>
             <DrawerTrigger asChild>
               <Button

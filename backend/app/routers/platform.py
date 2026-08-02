@@ -118,7 +118,10 @@ async def save_system_design_canvas(payload: dict = Body(...), user=Depends(User
 
 
 @router.get("/candidates")
-async def candidates(admin=Depends(AdminMiddleware.is_admin)):
+async def candidates():
+    # Public recruiter talent directory — consumed by the public /recruiter page.
+    # Returns user profile cards (name, rating, top domain, location, skill scores)
+    # from the users collection; NOT the candidates_info lead export. Public by design.
     return await PlatformController.candidates()
 
 

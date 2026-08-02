@@ -78,6 +78,9 @@ Desktop.ini
 tmp/
 temp/
 *.tmp
+# Scratch / throwaway experiment scripts
+scratch/
+text.txt
 # =========================
 # Package Managers
 # =========================

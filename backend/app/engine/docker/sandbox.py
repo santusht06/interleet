@@ -436,9 +436,9 @@ class DockerSandbox:
 
             wall_time_ms = (time.monotonic() - start) * 1000
 
-            # Enforce output size limit
+            # Enforce output size limit (stdout is already a decoded str here)
             if len(stdout.encode()) > MAX_OUTPUT_BYTES:
-                stdout = stdout[:MAX_OUTPUT_BYTES].decode("utf-8", errors="replace")
+                stdout = stdout.encode("utf-8")[:MAX_OUTPUT_BYTES].decode("utf-8", errors="ignore")
                 stderr += "\n[Output truncated: exceeded 10MB limit]"
 
             return SandboxResult(
@@ -546,8 +546,8 @@ class DockerSandbox:
             wall_time_ms = (time.monotonic() - start) * 1000
 
             if len(stdout.encode()) > MAX_OUTPUT_BYTES:
-                stdout = stdout[:MAX_OUTPUT_BYTES].decode("utf-8", errors="replace")
-                stderr += "\\n[Output truncated: exceeded 10MB limit]"
+                stdout = stdout.encode("utf-8")[:MAX_OUTPUT_BYTES].decode("utf-8", errors="ignore")
+                stderr += "\n[Output truncated: exceeded 10MB limit]"
 
             return SandboxResult(
                 stdout=stdout,

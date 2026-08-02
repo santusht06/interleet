@@ -59,6 +59,7 @@ from app.routers.notification import router as notification_router
 from app.routers.store import router as store_router
 from app.routers.validation import router as validation_router
 from app.routers.settings import router as settings_router
+from app.routers.recruiter import router as recruiter_router
 
 
 # ─── Judge Engine ──────────────────────────────────────────────────
@@ -191,6 +192,7 @@ app.include_router(notification_router)
 app.include_router(store_router)
 app.include_router(validation_router)
 app.include_router(settings_router)
+app.include_router(recruiter_router)
 
 
 

@@ -31,6 +31,7 @@ Route order:
 """
 import io
 import json
+import secrets
 
 import anyio
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
@@ -277,6 +278,36 @@ async def text_to_speech(text: str, voice: str = "nova"):
         raise
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+# ─── POST /{session_id}/share & GET /shared/{token}  (before the wildcard) ───
+
+@router.post("/{session_id}/share")
+async def share_report(session_id: str, user_auth=Depends(UserMiddleware.me)):
+    """Create (or return an existing) public share link for the caller's own report."""
+    doc = await InterviewReportRepository.get_report(session_id)
+    if doc is None:
+        raise HTTPException(status_code=404, detail="Interview report not found")
+    requester = (user_auth or {}).get("user", {}).get("user_id")
+    if doc.get("user_id") and requester and doc.get("user_id") != requester:
+        raise HTTPException(status_code=403, detail="You do not own this interview report")
+    token = doc.get("share_token") or secrets.token_urlsafe(16)
+    await InterviewReportRepository.set_share_token(session_id, token)
+    return {"share_token": token, "share_url": f"/shared/report/{token}"}
+
+
+@router.get("/shared/{token}")
+async def get_shared_report(token: str):
+    """Public, read-only view of a shared interview report. No auth, no mutation."""
+    doc = await InterviewReportRepository.get_by_share_token(token)
+    if doc is None:
+        raise HTTPException(status_code=404, detail="Shared report not found")
+    return {
+        "role": doc.get("role"),
+        "interview_type": doc.get("interview_type"),
+        "created_at": doc.get("created_at"),
+        "report": doc.get("report", {}),
+    }
 
 
 # ─── GET /{session_id}  (wildcard — MUST be after all static GET routes) ─────

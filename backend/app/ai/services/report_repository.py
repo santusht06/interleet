@@ -104,3 +104,19 @@ class InterviewReportRepository:
             .limit(limit)
         )
         return [document async for document in cursor]
+
+    @classmethod
+    async def set_share_token(cls, session_id: str, token: str) -> None:
+        db = get_db()
+        await db[cls.collection_name].update_one(
+            {"session_id": session_id},
+            {"$set": {"share_token": token}},
+        )
+
+    @classmethod
+    async def get_by_share_token(cls, token: str) -> dict[str, Any] | None:
+        db = get_db()
+        return await db[cls.collection_name].find_one(
+            {"share_token": token},
+            {"_id": 0},
+        )

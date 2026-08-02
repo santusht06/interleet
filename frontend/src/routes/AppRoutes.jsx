@@ -61,6 +61,7 @@ import { useSelector } from "react-redux";
 // Admin + misc
 import AdminPage from "@/pages/admin";
 import NotFoundPage from "@/pages/NotFound";
+import SharedReportPage from "@/pages/SharedReport";
 
 function ProfileRedirect() {
   const { user } = useSelector((state) => state.user);
@@ -119,6 +120,10 @@ export const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: <Navigate to="/app/dashboard" replace />,
+  },
+  {
+    path: "/shared/report/:token",
+    element: <SharedReportPage />,
   },
 
   // ── Auth routes (redirect away if already logged in) ─────────────────────

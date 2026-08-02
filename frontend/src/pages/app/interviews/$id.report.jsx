@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Check, X, ArrowRight, Loader2, AlertTriangle, Trophy, Target, TrendingUp, BookOpen } from "lucide-react";
+import { Check, X, ArrowRight, Loader2, AlertTriangle, Trophy, Target, TrendingUp, BookOpen, Share2 } from "lucide-react";
 import {
   ResponsiveContainer,
   RadarChart,
@@ -32,6 +32,7 @@ import {
 } from "recharts";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { fetchReport } from "@/redux/slices/interviewsSlice";
+import { API } from "@/api/api";
 
 // ─── Score Badge ─────────────────────────────────────────────────────────────
 
@@ -98,6 +99,27 @@ function ReportPage() {
   const { report, reportLoading, reportError } = useAppSelector(
     (s) => s.interviews
   );
+
+  const [shareUrl, setShareUrl] = useState("");
+  const [sharing, setSharing] = useState(false);
+
+  async function handleShare() {
+    setSharing(true);
+    try {
+      const { data } = await API.post(`/interview/${id}/share`);
+      const url = window.location.origin + data.share_url;
+      setShareUrl(url);
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        /* clipboard may be blocked; the link is still shown below */
+      }
+    } catch {
+      /* keep silent; button re-enables so the user can retry */
+    } finally {
+      setSharing(false);
+    }
+  }
 
   useEffect(() => {
     // If we don't have a report yet (or it's for a different session), fetch it
@@ -247,13 +269,32 @@ function ReportPage() {
         badge={`Session · ${id?.slice(0, 8)}`}
         description={`${role} · ${difficulty} — AI-graded breakdown of your performance with personalized feedback.`}
         actions={
-          <Button asChild className="bg-primary hover:bg-orange-600 text-white">
-            <Link to="/app/interviews">
-              Run another <ArrowRight className="ml-1.5 h-4 w-4" />
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleShare} disabled={sharing}>
+              {sharing ? (
+                <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+              ) : (
+                <Share2 className="mr-1.5 h-4 w-4" />
+              )}
+              Share
+            </Button>
+            <Button asChild className="bg-primary hover:bg-orange-600 text-white">
+              <Link to="/app/interviews">
+                Run another <ArrowRight className="ml-1.5 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
         }
       />
+
+      {shareUrl && (
+        <div className="mx-4 md:mx-8 mt-3 rounded-lg border border-primary/40 bg-primary/10 p-3 text-sm text-zinc-200">
+          Public link copied —{" "}
+          <a href={shareUrl} target="_blank" rel="noreferrer" className="underline break-all">
+            {shareUrl}
+          </a>
+        </div>
+      )}
 
       <div className="space-y-6 px-4 py-6 md:px-8">
 

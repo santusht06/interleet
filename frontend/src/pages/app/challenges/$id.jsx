@@ -30,6 +30,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { DifficultyPill, DomainTag } from "@/components/domain/Tags";
+import { DiscussionPanel } from "@/components/domain/DiscussionPanel";
 import {
   ArrowLeft,
   ArrowRight,
@@ -316,13 +317,11 @@ function ChallengeDetail() {
               </li>
             </ul>
           </Card>
-          <Card className="border-border bg-card p-5">
-            <h3 className="text-sm font-semibold">Discussion</h3>
-            <p className="mt-2 text-xs text-muted-foreground">
-              328 engineers discussing tradeoffs. Open after you submit.
-            </p>
-          </Card>
         </div>
+      </div>
+
+      <div className="px-4 pb-8 md:px-8">
+        <DiscussionPanel slug={slug} />
       </div>
     </AppShell>
   );

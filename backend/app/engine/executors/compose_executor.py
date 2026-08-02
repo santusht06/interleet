@@ -14,6 +14,7 @@
 
 import asyncio
 import os
+import re
 import time
 import subprocess
 from pathlib import Path
@@ -22,6 +23,40 @@ import aiofiles
 from app.engine.enums import Language, Verdict
 from app.engine.schemas import SandboxResult, TestCaseSchema, TestCaseResult
 from app.engine.executors.base import BaseExecutor
+
+
+# Compose directives that would let a candidate-controlled compose file break out
+# of the sandbox onto the host (it runs against the host Docker daemon). Best-effort
+# denylist / defense-in-depth — the robust fix is running compose inside an isolated
+# (rootless / DinD) daemon rather than on the host socket.
+_COMPOSE_DANGER_PATTERNS = [
+    (re.compile(r"privileged\s*:\s*true", re.I), "privileged mode"),
+    (re.compile(r"network_mode\s*:\s*['\"]?host", re.I), "host network mode"),
+    (re.compile(r"\bpid\s*:\s*['\"]?host", re.I), "host PID namespace"),
+    (re.compile(r"\bipc\s*:\s*['\"]?host", re.I), "host IPC namespace"),
+    (re.compile(r"\buserns_mode\s*:\s*['\"]?host", re.I), "host user namespace"),
+    (re.compile(r"\bcap_add\s*:", re.I), "added Linux capabilities"),
+    (re.compile(r"\bdevices\s*:", re.I), "host device passthrough"),
+    (re.compile(r"\bsecurity_opt\s*:", re.I), "custom security options"),
+    (re.compile(r"\bcgroup_parent\s*:", re.I), "custom cgroup parent"),
+    (re.compile(r"/var/run/docker\.sock", re.I), "Docker socket mount"),
+    # Absolute or parent-relative host bind mounts (short syntax `- /host:/ctr`).
+    (re.compile(r"^\s*-\s*['\"]?(/|~|\.\./)[^:\n]*:", re.M), "host-path bind mount"),
+    # Long syntax bind source pointing outside the workspace.
+    (re.compile(r"\bsource\s*:\s*['\"]?(/|~|\.\.)", re.I), "host-path bind mount"),
+]
+
+
+def _scan_compose_danger(text: str):
+    """Return a human-readable reason if the compose text requests a host-level
+    escape primitive, else None."""
+    if not text:
+        return None
+    for pattern, reason in _COMPOSE_DANGER_PATTERNS:
+        if pattern.search(text):
+            return reason
+    return None
+
 
 class ComposeExecutor(BaseExecutor):
     """
@@ -119,6 +154,28 @@ class ComposeExecutor(BaseExecutor):
                 return port
             
             free_port = get_free_port()
+
+            # Reject compose files that request host-level escape primitives before
+            # anything is written to disk or handed to the host Docker daemon.
+            _compose_texts = []
+            try:
+                _parsed = json.loads(code)
+                if isinstance(_parsed, dict):
+                    _compose_texts = [c for n, c in _parsed.items()
+                                      if isinstance(c, str) and n.lower().endswith((".yml", ".yaml"))]
+                else:
+                    _compose_texts = [code]
+            except json.JSONDecodeError:
+                _compose_texts = [code]
+            for _txt in _compose_texts:
+                _reason = _scan_compose_danger(_txt)
+                if _reason:
+                    msg = f"Compose configuration rejected: {_reason} is not allowed in the sandbox."
+                    return [
+                        SandboxResult(stdout="", stderr=msg, exit_code=1, wall_time_ms=0,
+                                      peak_memory_mb=0, timed_out=False, oom_killed=False)
+                        for _ in testcases
+                    ]
 
             try:
                 files = json.loads(code)

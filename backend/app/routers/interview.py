@@ -55,6 +55,14 @@ def _interviewer_message(state: dict) -> str:
     return f"{preamble}\n\n{question}" if preamble else question
 
 
+def _assert_session_owner(state: dict, user_auth: dict) -> None:
+    """Reject access to an interview session/report the caller does not own."""
+    owner = state.get("user_id")
+    requester = (user_auth or {}).get("user", {}).get("user_id")
+    if owner and requester and owner != requester:
+        raise HTTPException(status_code=403, detail="You do not have access to this interview session")
+
+
 # ─── POST /start ─────────────────────────────────────────────────────────────
 
 @router.post("/start")
@@ -101,7 +109,7 @@ async def start_interview(payload: dict, user_auth=Depends(UserMiddleware.me)):
 # ─── POST /answer ─────────────────────────────────────────────────────────────
 
 @router.post("/answer")
-async def answer_question(payload: dict):
+async def answer_question(payload: dict, user_auth=Depends(UserMiddleware.me)):
     session_id = payload.get("session_id")
     answer     = payload.get("answer", "").strip()
     if not session_id or not answer:
@@ -110,6 +118,7 @@ async def answer_question(payload: dict):
     state = await SessionService.get_session(session_id)
     if state is None:
         raise HTTPException(status_code=404, detail="Interview session not found")
+    _assert_session_owner(state, user_auth)
 
     state["last_answer"]       = answer
     state["last_answer_topic"] = payload.get("topic", state.get("current_topic", ""))
@@ -172,7 +181,7 @@ async def answer_question(payload: dict):
 # ─── POST /end ────────────────────────────────────────────────────────────────
 
 @router.post("/end")
-async def end_interview_early(payload: dict):
+async def end_interview_early(payload: dict, user_auth=Depends(UserMiddleware.me)):
     """End an interview early (user hangs up mid-session).
     Builds a real partial report from whatever turns have been evaluated.
     """
@@ -185,8 +194,10 @@ async def end_interview_early(payload: dict):
         # Already ended — return saved report if available
         saved = await InterviewReportRepository.get_report(session_id)
         if saved:
+            _assert_session_owner(saved, user_auth)
             return {"session_id": session_id, "report": saved.get("report", {})}
         raise HTTPException(status_code=404, detail="Interview session not found")
+    _assert_session_owner(state, user_auth)
 
     report = InterviewReportService.build_report(state)
     report["status"] = "ended_early"
@@ -243,7 +254,7 @@ async def get_interview_presets():
 # ─── GET /tts  (MUST be before /{session_id}) ────────────────────────────────
 
 @router.get("/tts")
-async def text_to_speech(text: str, voice: str = "nova"):
+async def text_to_speech(text: str, voice: str = "nova", user_auth=Depends(UserMiddleware.me)):
     """Generate professional, human-like voice speech for Sara's questions."""
     if not OPENAI_API_KEY:
         raise HTTPException(
@@ -282,20 +293,22 @@ async def text_to_speech(text: str, voice: str = "nova"):
 # ─── GET /{session_id}  (wildcard — MUST be after all static GET routes) ─────
 
 @router.get("/{session_id}")
-async def get_interview_session(session_id: str):
+async def get_interview_session(session_id: str, user_auth=Depends(UserMiddleware.me)):
     state = await SessionService.get_session(session_id)
     if state is None:
         raise HTTPException(status_code=404, detail="Interview session not found")
+    _assert_session_owner(state, user_auth)
     return state
 
 
 # ─── GET /{session_id}/report ─────────────────────────────────────────────────
 
 @router.get("/{session_id}/report")
-async def get_interview_report(session_id: str):
+async def get_interview_report(session_id: str, user_auth=Depends(UserMiddleware.me)):
     # Try live session first (most up-to-date)
     state = await SessionService.get_session(session_id)
     if state is not None:
+        _assert_session_owner(state, user_auth)
         report = InterviewReportService.build_report(state)
         report["status"] = "completed"
         await InterviewReportRepository.save_report(
@@ -310,6 +323,7 @@ async def get_interview_report(session_id: str):
     saved_report = await InterviewReportRepository.get_report(session_id)
     if saved_report is None:
         raise HTTPException(status_code=404, detail="Interview report not found")
+    _assert_session_owner(saved_report, user_auth)
     return saved_report.get("report", saved_report)
 
 

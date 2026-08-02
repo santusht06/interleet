@@ -34,6 +34,7 @@ from typing import Any, Optional
 from fastapi import APIRouter, Body, HTTPException, Query, Depends, WebSocket, WebSocketDisconnect
 
 from app.middleware.user import Middleware as UserMiddleware
+from app.utils.JWT import verify_token
 from app.core.db import get_db
 from app.engine.controllers.submission_controller import EngineSubmissionController
 from app.engine.docker.pool import get_available_languages, verify_sandbox_images
@@ -79,6 +80,7 @@ async def execute_code(
             }
         },
     ),
+    user_auth=Depends(UserMiddleware.me),
 ) -> dict[str, Any]:
     """
     **Synchronous code execution.**
@@ -125,6 +127,7 @@ async def run_code(
             }
         },
     ),
+    user_auth=Depends(UserMiddleware.me),
 ) -> dict[str, Any]:
     """
     **Run code against visible sample test cases.**
@@ -413,7 +416,7 @@ class DevOpsSessionExecRequest(BaseModel):
     command: str
 
 @engine_router.post("/devops/session/start", summary="Start interactive DevOps session container")
-async def api_start_devops_session(request: DevOpsSessionStartRequest):
+async def api_start_devops_session(request: DevOpsSessionStartRequest, user_auth=Depends(UserMiddleware.me)):
     db = get_db()
     
     challenge = await db.problems.find_one({"slug": request.slug})
@@ -484,7 +487,7 @@ async def api_start_devops_session(request: DevOpsSessionStartRequest):
     }
 
 @engine_router.post("/devops/session/{session_id}/sync", summary="Sync files to DevOps container workspace")
-async def api_sync_devops_session(session_id: str, request: DevOpsSessionSyncRequest):
+async def api_sync_devops_session(session_id: str, request: DevOpsSessionSyncRequest, user_auth=Depends(UserMiddleware.me)):
     workspace_base = get_workspace_base()
     workspace_dir = workspace_base / f"devops_{session_id}"
     if not workspace_dir.exists():
@@ -504,7 +507,7 @@ async def api_sync_devops_session(session_id: str, request: DevOpsSessionSyncReq
     return {"success": True}
 
 @engine_router.post("/devops/session/{session_id}/exec", summary="Run shell command in DevOps container")
-async def api_exec_devops_session(session_id: str, request: DevOpsSessionExecRequest):
+async def api_exec_devops_session(session_id: str, request: DevOpsSessionExecRequest, user_auth=Depends(UserMiddleware.me)):
     client = get_docker_client()
     container_name = f"interleet-devops-session-{session_id}"
     
@@ -535,7 +538,7 @@ async def api_exec_devops_session(session_id: str, request: DevOpsSessionExecReq
         raise HTTPException(status_code=500, detail=f"Failed to execute command inside sandbox: {exc}")
 
 @engine_router.post("/devops/session/{session_id}/stop", summary="Stop and clean up DevOps session")
-async def api_stop_devops_session(session_id: str):
+async def api_stop_devops_session(session_id: str, user_auth=Depends(UserMiddleware.me)):
     client = get_docker_client()
     container_name = f"interleet-devops-session-{session_id}"
     
@@ -558,7 +561,14 @@ async def api_stop_devops_session(session_id: str):
 @engine_router.websocket("/devops/session/{session_id}/ws")
 async def api_ws_devops_session(websocket: WebSocket, session_id: str):
     await websocket.accept()
-    
+
+    # Authenticate the socket via the `user` JWT cookie (or ?token= fallback).
+    token = websocket.cookies.get("user") or websocket.query_params.get("token")
+    if not token or not verify_token(token):
+        await websocket.send_text("\r\n[Error: Unauthorized]\r\n")
+        await websocket.close(code=1008)
+        return
+
     client = get_docker_client()
     container_name = f"interleet-devops-session-{session_id}"
     

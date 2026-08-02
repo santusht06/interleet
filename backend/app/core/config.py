@@ -45,6 +45,14 @@ JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 JWT_EXPIRES = int(os.getenv("JWT_EXPIRES", 7))
 
 
+# ADMIN ACCESS
+# Comma-separated allowlist of admin emails + a required login code.
+# BOTH must be set for the admin-login endpoint to work — it fails closed if unset.
+# Replaces the previously hardcoded email + "6969" backdoor.
+ADMIN_EMAILS = [e.strip().lower() for e in os.getenv("ADMIN_EMAILS", "").split(",") if e.strip()]
+ADMIN_LOGIN_CODE = os.getenv("ADMIN_LOGIN_CODE", "")
+
+
 # GOOGLE OAUTH CLIENT
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")

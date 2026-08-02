@@ -85,8 +85,8 @@ services:
     environment:
       <<: *env-common
       WORKER_COUNT: "0"  # API container runs no workers (separate worker service)
-      SESSION_SECRET_KEY: ${SESSION_SECRET_KEY:-change_me_in_production}
-      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+      SESSION_SECRET_KEY: ${SESSION_SECRET_KEY:?SESSION_SECRET_KEY must be set}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be set}
       GROQ_API_KEY: ${GROQ_API_KEY:-}
     volumes:
       - ./backend:/app

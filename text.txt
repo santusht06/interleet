@@ -112,6 +112,7 @@ function ChallengesPage() {
               placeholder="Search challenges, tags, technologies…"
               className="h-9 border-transparent bg-background pl-9"
             />
+export
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Select value={domain} onValueChange={setDomain}>

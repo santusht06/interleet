@@ -29,6 +29,7 @@ from app.engine.executors.python_executor import PythonExecutor
 from app.engine.executors.rust_executor import RustExecutor
 from app.engine.executors.typescript_executor import TypeScriptExecutor
 from app.engine.executors.browser_executor import BrowserExecutor
+from app.engine.executors.database_executor import DatabaseExecutor
 
 _REGISTRY: dict[Language, type[BaseExecutor]] = {
     Language.PYTHON: PythonExecutor,
@@ -40,6 +41,12 @@ _REGISTRY: dict[Language, type[BaseExecutor]] = {
     Language.JAVA: JavaExecutor,
     Language.HTML: BrowserExecutor,
     Language.MULTI: PythonExecutor,  # Fallback
+    Language.SQL: DatabaseExecutor,
+    Language.SQLITE: DatabaseExecutor,
+    Language.POSTGRESQL: DatabaseExecutor,
+    Language.MYSQL: DatabaseExecutor,
+    Language.MONGODB: DatabaseExecutor,
+    Language.REDIS: DatabaseExecutor,
 }
 
 # Language metadata for API responses / UI
@@ -53,6 +60,12 @@ LANGUAGE_META: dict[Language, dict] = {
     Language.JAVA: {"name": "Java 21 (JDK)", "extension": "java", "compiled": True},
     Language.HTML: {"name": "HTML/CSS/JS", "extension": "html", "compiled": False},
     Language.MULTI: {"name": "Multi-File", "extension": "", "compiled": False},
+    Language.SQL: {"name": "SQL", "extension": "sql", "compiled": False},
+    Language.SQLITE: {"name": "SQLite", "extension": "sql", "compiled": False},
+    Language.POSTGRESQL: {"name": "PostgreSQL", "extension": "sql", "compiled": False},
+    Language.MYSQL: {"name": "MySQL", "extension": "sql", "compiled": False},
+    Language.MONGODB: {"name": "MongoDB", "extension": "json", "compiled": False},
+    Language.REDIS: {"name": "Redis", "extension": "txt", "compiled": False},
 }
 
 
@@ -79,6 +92,10 @@ class ExecutorFactory:
             except ValueError:
                 raise ValueError(f"Unsupported language: {language!r}") from None
 
+        # 1. Database Evaluation Mode
+        if execution_mode == "database" or language in [Language.SQL, Language.SQLITE, Language.POSTGRESQL, Language.MYSQL, Language.MONGODB, Language.REDIS]:
+            return DatabaseExecutor(language)
+
         # 2. DevOps/SysAdmin Evaluation Mode
         if execution_mode == "devops":
             from app.engine.executors.devops_executor import DevOpsExecutor
@@ -92,7 +109,7 @@ class ExecutorFactory:
         if execution_mode == "browser":
             return BrowserExecutor()
 
-        # 3. HTTP/Service Evaluation Mode
+        # 4. HTTP/Service Evaluation Mode
         if execution_mode == "http":
             from app.engine.executors.service_executor import ServiceExecutor
             return ServiceExecutor(language)

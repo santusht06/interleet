@@ -30,6 +30,12 @@ class Language(str, Enum):
     JAVA = "java"
     HTML = "html"
     MULTI = "multi"
+    SQL = "sql"
+    SQLITE = "sqlite"
+    POSTGRESQL = "postgresql"
+    MYSQL = "mysql"
+    MONGODB = "mongodb"
+    REDIS = "redis"
 
 
 class Verdict(str, Enum):

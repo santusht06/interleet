@@ -1,0 +1,34 @@
+{
+  "id": "database",
+  "version": "2.0",
+  "name": "Database Engine Sandbox",
+  "executionMode": "database",
+  "editor": {
+    "mode": "database",
+    "supportedEngines": ["postgresql", "mysql", "sqlite", "mongodb", "redis"]
+  },
+  "os": "Alpine Linux (DB Suite)",
+  "capabilities": {
+    "filesystem": false,
+    "docker": false,
+    "dockerCompose": false,
+    "network": "isolated",
+    "browser": false
+  },
+  "services": [
+    "PostgreSQL 16 Engine",
+    "MySQL 8.0 Engine",
+    "SQLite 3.45 Engine",
+    "MongoDB 7.0 Document Engine",
+    "Redis 7.2 In-Memory Store",
+    "Schema & Fixtures Inspector",
+    "Tabular Query Result Formatter"
+  ],
+  "limits": {
+    "timeoutSeconds": 15,
+    "memoryMb": 512,
+    "network": "isolated"
+  },
+  "artifacts": ["query_result", "table_output", "execution_plan", "stdout", "stderr"],
+  "pipeline": ["Database Provisioned", "Schema & Fixtures Seeded", "Query Executed", "Result Assertion", "Cleanup"]
+}

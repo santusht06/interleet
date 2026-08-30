@@ -20,9 +20,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { AppShell, PageHeader } from "@/components/layout/AppShell";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { TrendingUp, TrendingDown, Minus, Flame, Sparkles } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Flame, Sparkles, Lock } from "lucide-react";
 import { API } from "@/api/api";
 import { leaderboard as mockLeaderboard } from "@/lib/mock";
 
@@ -222,32 +223,32 @@ import { memo } from "react";
 const Leaderboard = memo(function Leaderboard() {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.user);
-  const [leaderboardData, setLeaderboardData] = useState(cachedLeaderboardData || []);
-  const [loading, setLoading] = useState(!cachedLeaderboardData);
-  const [podiumVisible, setPodiumVisible] = useState(!!cachedLeaderboardData);
+  const [leaderboardData, setLeaderboardData] = useState([]);
+  const [isLocked, setIsLocked] = useState(true);
+  const [usersCount, setUsersCount] = useState(0);
+  const [targetUsers, setTargetUsers] = useState(20);
+  const [loading, setLoading] = useState(true);
+  const [podiumVisible, setPodiumVisible] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
     const fetchLeaderboard = async () => {
-      if (cachedLeaderboardData) {
-        setLeaderboardData(cachedLeaderboardData);
-        setLoading(false);
-        setPodiumVisible(true);
-      }
       try {
         const response = await API.get("/api/leaderboard");
         if (isMounted) {
-          const items = response.data?.items || mockLeaderboard;
-          cachedLeaderboardData = items;
-          setLeaderboardData(items);
+          const data = response.data || {};
+          const locked = data.locked || (data.users_count !== undefined && data.users_count < 20) || (data.items || []).length < 20;
+          setIsLocked(locked);
+          setUsersCount(data.users_count || 0);
+          setTargetUsers(data.target_users || 20);
+          setLeaderboardData(data.items || []);
           setLoading(false);
         }
       } catch (err) {
-        console.error("Failed to load live leaderboard, falling back to mock.", err);
+        console.error("Failed to load live leaderboard", err);
         if (isMounted) {
-          const items = cachedLeaderboardData || mockLeaderboard;
-          cachedLeaderboardData = items;
-          setLeaderboardData(items);
+          setIsLocked(true);
+          setLeaderboardData([]);
           setLoading(false);
         }
       }
@@ -380,237 +381,318 @@ const Leaderboard = memo(function Leaderboard() {
       />
       <div className="px-0 pb-6 md:px-0 space-y-6">
 
-        {/* ── Podium Section ── */}
-        {podiumUsers.length > 0 && (
-          <div className="relative flex flex-col items-center justify-center pt-8 pb-4 overflow-hidden border-b border-zinc-800/50">
+        {/* ── Locked Arena State (Calibration Mode < 20 Users) ── */}
+        {isLocked ? (
+          <div className="px-4 md:px-8 space-y-6">
+            {/* User Standing Banner */}
+            {user && (
+              <Card className="border-[#FF6500]/20 bg-gradient-to-r from-[#FF6500]/5 via-zinc-950 to-zinc-950 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#FF6500]/10 border border-[#FF6500]/25 text-[#FF6500]">
+                    <Flame className="h-5 w-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">Your Arena Rating</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Your rating is active and ready for global rankings. Keep solving challenges to level up!
+                    </p>
+                  </div>
+                </div>
 
-            {/* Dot bg — exact homepage hero pattern */}
-            <div className="dot-bg pointer-events-none absolute inset-0 opacity-40" />
-            {/* Orange radial glow — exact homepage hero gradient */}
-            <div
-              className="pointer-events-none absolute inset-x-0 -top-32 h-[500px] bg-[radial-gradient(ellipse_at_top,theme(colors.primary/15),transparent_60%)]"
-              aria-hidden
-            />
+                <div className="flex items-center gap-6">
+                  <div className="text-center sm:text-right">
+                    <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Rating</span>
+                    <span className="text-base font-bold text-white">{user.rating || 1000}</span>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Level</span>
+                    <span className="text-base font-bold text-[#FF6500]">{Math.floor((user.xp || 0) / 1000) + 1}</span>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Streak</span>
+                    <span className="text-base font-bold text-amber-500 inline-flex items-center gap-1">
+                      <Flame className="h-3.5 w-3.5 fill-amber-500" />
+                      {user.streak_count || user.streak || 0}d
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            )}
 
+            {/* Calibration / Unlocking Soon Card */}
+            <Card className="relative overflow-hidden border border-zinc-800/80 bg-zinc-950/70 backdrop-blur-md p-8 md:p-10 text-center shadow-xl">
+              {/* Subtle accent glow */}
+              <div className="pointer-events-none absolute inset-x-0 -top-24 h-48 bg-[radial-gradient(ellipse_at_top,theme(colors.primary/10),transparent_70%)]" />
 
-            {/* Title with sparkle */}
-            <div
-              className={`flex items-center gap-2 mb-6 transition-all duration-700 ${podiumVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}
-            >
-              <Sparkles className="h-4 w-4 text-yellow-500 animate-pulse" />
-              <span className="text-xs font-mono font-bold tracking-[0.25em] uppercase text-yellow-500/80">
-                Hall of Champions
-              </span>
-              <Sparkles className="h-4 w-4 text-yellow-500 animate-pulse" />
-            </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300 mb-4">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+                <span className="h-2 w-2 rounded-full bg-emerald-500 absolute" />
+                <span className="ml-2 font-medium">Arena Calibration in Progress</span>
+              </div>
 
-            {/* Podium Row */}
-            <div className="flex items-end justify-center gap-2 md:gap-6 w-full max-w-3xl px-6 md:px-20 relative z-10">
-              {podiumUsers.map((u) => (
-                <PodiumCard
-                  key={u.username}
-                  userData={u}
-                  spot={u.spot}
-                  visible={podiumVisible}
-                />
-              ))}
-            </div>
+              <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                Global Rankings Unlocking Soon
+              </h2>
+              <p className="mt-2 text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
+                Live rankings activate automatically as the initial cohort of 20 engineers complete arena challenges.
+              </p>
+
+              {/* Minimalist Progress Indicator */}
+              <div className="w-full max-w-sm mx-auto mt-6 space-y-2">
+                <div className="flex justify-between items-center text-xs font-mono">
+                  <span className="text-zinc-500">Qualification Progress</span>
+                  <span className="text-zinc-200 font-semibold">{usersCount} of {targetUsers} Engineers</span>
+                </div>
+                <div className="h-2 w-full rounded-full bg-zinc-900 border border-zinc-800/80 p-0.5 overflow-hidden">
+                  <div 
+                    className="h-full rounded-full bg-gradient-to-r from-[#FF6500] to-amber-500 transition-all duration-700 shadow-sm"
+                    style={{ width: `${Math.min(100, Math.max(5, (usersCount / targetUsers) * 100))}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button 
+                  onClick={() => navigate("/app/challenges")} 
+                  className="bg-[#FF6500] hover:bg-[#ff751a] text-white font-medium text-xs px-5 h-9 shadow-md shadow-[#FF6500]/15"
+                >
+                  <Sparkles className="h-3.5 w-3.5 mr-2" />
+                  Practice Challenges
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({ title: "Interleet Engineering Challenges", url: "https://interleet.sharexpress.in" });
+                    } else {
+                      navigator.clipboard.writeText("https://interleet.sharexpress.in");
+                      alert("Platform link copied to clipboard!");
+                    }
+                  }}
+                  className="border-zinc-800 text-zinc-300 hover:bg-zinc-900 text-xs h-9"
+                >
+                  Invite Engineers
+                </Button>
+              </div>
+            </Card>
           </div>
-        )}
+        ) : (
+          <>
+            {/* ── Podium Section (Shown when unlocked) ── */}
+            {podiumUsers.length > 0 && (
+              <div className="relative flex flex-col items-center justify-center pt-8 pb-4 overflow-hidden border-b border-zinc-800/50">
+                <div className="dot-bg pointer-events-none absolute inset-0 opacity-40" />
+                <div className="pointer-events-none absolute inset-x-0 -top-32 h-[500px] bg-[radial-gradient(ellipse_at_top,theme(colors.primary/15),transparent_60%)]" aria-hidden />
 
-        {/* ── Below-podium content wrapper ── */}
-        <div className="px-4 md:px-8 space-y-6">
+                <div className={`flex items-center gap-2 mb-6 transition-all duration-700 ${podiumVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}`}>
+                  <Sparkles className="h-4 w-4 text-yellow-500 animate-pulse" />
+                  <span className="text-xs font-mono font-bold tracking-[0.25em] uppercase text-yellow-500/80">
+                    Hall of Champions
+                  </span>
+                  <Sparkles className="h-4 w-4 text-yellow-500 animate-pulse" />
+                </div>
 
-        {/* ── User Spotlight Banner ── */}
-        {user && (
-          <Card className="border-[#FF6500]/25 bg-gradient-to-r from-[#FF6500]/5 via-zinc-950 to-[#FF6500]/5 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg glow-soft">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF6500]/15 border border-[#FF6500]/30 text-[#FF6500]">
-                <Flame className="h-6 w-6 animate-pulse" />
+                <div className="flex items-end justify-center gap-2 md:gap-6 w-full max-w-3xl px-6 md:px-20 relative z-10">
+                  {podiumUsers.map((u) => (
+                    <PodiumCard key={u.username} userData={u} spot={u.spot} visible={podiumVisible} />
+                  ))}
+                </div>
               </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Your Standing in the Arena</h4>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {spotlightUser
-                    ? `You are ranked #${spotlightUser.rank} with ${spotlightUser.rating} rating. Keep solving challenges to climb higher!`
-                    : `You are ranked #${user.rank || "Unranked"} with ${user.rating || 0} rating. Climb the Leaderboard!`
-                  }
-                </p>
-              </div>
-            </div>
+            )}
 
-            <div className="flex items-center gap-6">
-              <div className="text-center sm:text-right">
-                <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Rating</span>
-                <span className="text-lg font-bold text-white">{user.rating || 0}</span>
-              </div>
-              <div className="text-center sm:text-right">
-                <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Level</span>
-                <span className="text-lg font-bold text-[#FF6500]">{Math.floor((user.xp || 0) / 1000) + 1}</span>
-              </div>
-              <div className="text-center sm:text-right">
-                <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Streak</span>
-                <span className="text-lg font-bold text-chart-3 inline-flex items-center gap-1">
-                  <Flame className="h-4 w-4 fill-chart-3" />
-                  {user.streak_count || user.streak || 0}d
-                </span>
-              </div>
-            </div>
-          </Card>
-        )}
+            <div className="px-4 md:px-8 space-y-6">
+              {/* ── User Spotlight Banner ── */}
+            {user && (
+              <Card className="border-[#FF6500]/25 bg-gradient-to-r from-[#FF6500]/5 via-zinc-950 to-[#FF6500]/5 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg glow-soft">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF6500]/15 border border-[#FF6500]/30 text-[#FF6500]">
+                    <Flame className="h-6 w-6 animate-pulse" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-white">Your Standing in the Arena</h4>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {spotlightUser
+                        ? `You are ranked #${spotlightUser.rank} with ${spotlightUser.rating} rating. Keep solving challenges to climb higher!`
+                        : `You are ranked #${user.rank || "Unranked"} with ${user.rating || 0} rating. Climb the Leaderboard!`
+                      }
+                    </p>
+                  </div>
+                </div>
 
-        {/* ── Leaderboard Lists ── */}
-        <Tabs defaultValue="global" className="w-full">
-          <div className="flex justify-between items-center border-b border-zinc-800 pb-2">
-            <TabsList className="bg-zinc-900 border border-zinc-800">
-              <TabsTrigger value="global" className="font-semibold">Global Arena</TabsTrigger>
-              <TabsTrigger value="weekly" className="font-semibold">Weekly Sprint</TabsTrigger>
-              <TabsTrigger value="friends" className="font-semibold">Clan / Friends</TabsTrigger>
-            </TabsList>
-            <Badge variant="outline" className="font-mono text-xs text-muted-foreground py-1 bg-zinc-900 border-zinc-800">
-              Updated hourly
-            </Badge>
-          </div>
+                <div className="flex items-center gap-6">
+                  <div className="text-center sm:text-right">
+                    <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Rating</span>
+                    <span className="text-lg font-bold text-white">{user.rating || 0}</span>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Level</span>
+                    <span className="text-lg font-bold text-[#FF6500]">{Math.floor((user.xp || 0) / 1000) + 1}</span>
+                  </div>
+                  <div className="text-center sm:text-right">
+                    <span className="block text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Streak</span>
+                    <span className="text-lg font-bold text-chart-3 inline-flex items-center gap-1">
+                      <Flame className="h-4 w-4 fill-chart-3" />
+                      {user.streak_count || user.streak || 0}d
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            )}
 
-          {["global", "weekly", "friends"].map((tab) => (
-            <TabsContent key={tab} value={tab} className="mt-4">
-              <Card className="overflow-hidden border-border bg-card p-0 shadow-xl">
+            {/* ── Leaderboard Lists ── */}
+            <Tabs defaultValue="global" className="w-full">
+              <div className="flex justify-between items-center border-b border-zinc-800 pb-2">
+                <TabsList className="bg-zinc-900 border border-zinc-800">
+                  <TabsTrigger value="global" className="font-semibold">Global Arena</TabsTrigger>
+                  <TabsTrigger value="weekly" className="font-semibold">Weekly Sprint</TabsTrigger>
+                  <TabsTrigger value="friends" className="font-semibold">Clan / Friends</TabsTrigger>
+                </TabsList>
+                <Badge variant="outline" className="font-mono text-xs text-muted-foreground py-1 bg-zinc-900 border-zinc-800">
+                  Updated hourly
+                </Badge>
+              </div>
 
-                {/* Desktop view */}
-                <div className="hidden md:block">
-                  <table className="w-full text-sm">
-                    <thead className="bg-zinc-900/80 text-left text-xs text-muted-foreground">
-                      <tr>
-                        <th className="px-5 py-3.5 font-mono uppercase tracking-wider w-[80px] text-center">Rank</th>
-                        <th className="px-5 py-3.5 font-mono uppercase tracking-wider">Developer</th>
-                        <th className="px-5 py-3.5 font-mono uppercase tracking-wider text-center">Division Tier</th>
-                        <th className="px-5 py-3.5 font-mono uppercase tracking-wider text-center">Rating</th>
-                        <th className="px-5 py-3.5 font-mono uppercase tracking-wider text-center">Total XP</th>
-                        <th className="px-5 py-3.5 font-mono uppercase tracking-wider">Achievements</th>
-                        <th className="px-5 py-3.5 text-right font-mono uppercase tracking-wider">7d Change</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
+              {["global", "weekly", "friends"].map((tab) => (
+                <TabsContent key={tab} value={tab} className="mt-4">
+                  <Card className="overflow-hidden border-border bg-card p-0 shadow-xl">
+
+                    {/* Desktop view */}
+                    <div className="hidden md:block">
+                      <table className="w-full text-sm">
+                        <thead className="bg-zinc-900/80 text-left text-xs text-muted-foreground">
+                          <tr>
+                            <th className="px-5 py-3.5 font-mono uppercase tracking-wider w-[80px] text-center">Rank</th>
+                            <th className="px-5 py-3.5 font-mono uppercase tracking-wider">Developer</th>
+                            <th className="px-5 py-3.5 font-mono uppercase tracking-wider text-center">Division Tier</th>
+                            <th className="px-5 py-3.5 font-mono uppercase tracking-wider text-center">Rating</th>
+                            <th className="px-5 py-3.5 font-mono uppercase tracking-wider text-center">Total XP</th>
+                            <th className="px-5 py-3.5 font-mono uppercase tracking-wider">Achievements</th>
+                            <th className="px-5 py-3.5 text-right font-mono uppercase tracking-wider">7d Change</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {leaderboardData.length === 0 ? (
+                            <tr>
+                              <td colSpan="7" className="py-12 text-center text-muted-foreground">
+                                No active participants in this arena yet.
+                              </td>
+                            </tr>
+                          ) : (
+                            leaderboardData.map((row) => {
+                              const isSelf = user && row.username === user.username;
+                              const tier = getDivisionTier(row.rating, row.rank);
+                              return (
+                                <tr
+                                  key={row.username}
+                                  onClick={() => navigate(`/app/profile/${row.username}`)}
+                                  className={`border-t border-border hover:bg-zinc-900/40 cursor-pointer transition-colors ${isSelf ? "bg-[#FF6500]/5 border-l-2 border-l-[#FF6500]" : ""}`}
+                                >
+                                  <td className="px-5 py-4 text-center">
+                                    <span className={`inline-flex items-center justify-center font-mono font-bold text-sm w-7 h-7 rounded-full ${
+                                      row.rank === 1 ? "bg-yellow-500/15 text-yellow-400" :
+                                      row.rank === 2 ? "bg-zinc-300/15 text-zinc-300" :
+                                      row.rank === 3 ? "bg-amber-700/20 text-amber-500" :
+                                      "text-muted-foreground"
+                                    }`}>
+                                      #{row.rank}
+                                    </span>
+                                  </td>
+                                  <td className="px-5 py-4">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar className="h-8 w-8 border border-border">
+                                        <AvatarImage src={row.avatar} />
+                                        <AvatarFallback className="text-xs bg-zinc-800 text-zinc-300 font-bold">
+                                          {row.username.slice(0, 2).toUpperCase()}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <div>
+                                        <p className="font-semibold text-white text-sm">@{row.username}</p>
+                                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{row.country || "GLOBAL"}</p>
+                                      </div>
+                                    </div>
+                                  </td>
+                                  <td className="px-5 py-4 text-center">
+                                    <Badge variant="outline" className={`font-mono text-[10px] px-2 py-0.5 border ${tier.color}`}>
+                                      {tier.name}
+                                    </Badge>
+                                  </td>
+                                  <td className="px-5 py-4 text-center font-mono font-bold text-white">{row.rating}</td>
+                                  <td className="px-5 py-4 text-center font-mono text-zinc-300">{row.xp.toLocaleString()}</td>
+                                  <td className="px-5 py-4">
+                                    <div className="flex flex-wrap gap-1">
+                                      {(row.badges || []).map((b) => (
+                                        <Badge key={b} variant="outline" className="font-mono text-[9px] bg-zinc-900 border-zinc-800 text-zinc-400">
+                                          {b}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </td>
+                                  <td className={`px-5 py-4 text-right font-mono font-semibold ${row.delta > 0 ? "text-success" : row.delta < 0 ? "text-destructive" : "text-muted-foreground"}`}>
+                                    <span className="inline-flex items-center gap-1 justify-end">
+                                      {row.delta > 0 ? <TrendingUp className="h-3.5 w-3.5" /> : row.delta < 0 ? <TrendingDown className="h-3.5 w-3.5" /> : <Minus className="h-3.5 w-3.5" />}
+                                      {row.delta > 0 ? `+${row.delta}` : row.delta}
+                                    </span>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mobile view */}
+                    <ul className="divide-y divide-border md:hidden">
                       {leaderboardData.length === 0 ? (
-                        <tr>
-                          <td colSpan="7" className="py-12 text-center text-muted-foreground">
-                            No active participants in this arena yet.
-                          </td>
-                        </tr>
+                        <li className="py-8 text-center text-muted-foreground">No active participants.</li>
                       ) : (
                         leaderboardData.map((row) => {
                           const isSelf = user && row.username === user.username;
                           const tier = getDivisionTier(row.rating, row.rank);
                           return (
-                            <tr
+                            <li
                               key={row.username}
                               onClick={() => navigate(`/app/profile/${row.username}`)}
-                              className={`border-t border-border hover:bg-zinc-900/40 cursor-pointer transition-colors ${isSelf ? "bg-[#FF6500]/5 border-l-2 border-l-[#FF6500]" : ""}`}
+                              className={`flex items-center gap-3 p-4 hover:bg-zinc-900/20 cursor-pointer transition-colors ${isSelf ? "bg-[#FF6500]/5 border-l-2 border-l-[#FF6500]" : ""}`}
                             >
-                              <td className="px-5 py-4 text-center">
-                                <span className={`inline-flex items-center justify-center font-mono font-bold text-sm w-7 h-7 rounded-full ${
-                                  row.rank === 1 ? "bg-yellow-500/15 text-yellow-400" :
-                                  row.rank === 2 ? "bg-zinc-300/15 text-zinc-300" :
-                                  row.rank === 3 ? "bg-amber-700/20 text-amber-500" :
-                                  "text-muted-foreground"
-                                }`}>
-                                  #{row.rank}
-                                </span>
-                              </td>
-                              <td className="px-5 py-4">
-                                <div className="flex items-center gap-3">
-                                  <Avatar className="h-8 w-8 border border-border">
-                                    <AvatarImage src={row.avatar} />
-                                    <AvatarFallback className="text-xs bg-zinc-800 text-zinc-300 font-bold">
-                                      {row.username.slice(0, 2).toUpperCase()}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <p className="font-semibold text-white text-sm">@{row.username}</p>
-                                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{row.country || "GLOBAL"}</p>
-                                  </div>
+                              <span className={`w-8 font-mono text-center font-bold text-xs ${
+                                row.rank === 1 ? "text-yellow-500" :
+                                row.rank === 2 ? "text-zinc-300" :
+                                row.rank === 3 ? "text-amber-600" :
+                                "text-muted-foreground"
+                              }`}>
+                                #{row.rank}
+                              </span>
+                              <Avatar className="h-9 w-9 border border-border shrink-0">
+                                <AvatarImage src={row.avatar} />
+                                <AvatarFallback className="text-[10px] bg-zinc-800 text-zinc-300 font-bold">
+                                  {row.username.slice(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <p className="truncate text-sm font-semibold text-white">@{row.username}</p>
+                                  <Badge variant="outline" className={`font-mono text-[8px] px-1 border shrink-0 ${tier.color}`}>
+                                    {tier.name.split(" ")[0]}
+                                  </Badge>
                                 </div>
-                              </td>
-                              <td className="px-5 py-4 text-center">
-                                <Badge variant="outline" className={`font-mono text-[10px] px-2 py-0.5 border ${tier.color}`}>
-                                  {tier.name}
-                                </Badge>
-                              </td>
-                              <td className="px-5 py-4 text-center font-mono font-bold text-white">{row.rating}</td>
-                              <td className="px-5 py-4 text-center font-mono text-zinc-300">{row.xp.toLocaleString()}</td>
-                              <td className="px-5 py-4">
-                                <div className="flex flex-wrap gap-1">
-                                  {(row.badges || []).map((b) => (
-                                    <Badge key={b} variant="outline" className="font-mono text-[9px] bg-zinc-900 border-zinc-800 text-zinc-400">
-                                      {b}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              </td>
-                              <td className={`px-5 py-4 text-right font-mono font-semibold ${row.delta > 0 ? "text-success" : row.delta < 0 ? "text-destructive" : "text-muted-foreground"}`}>
-                                <span className="inline-flex items-center gap-1 justify-end">
-                                  {row.delta > 0 ? <TrendingUp className="h-3.5 w-3.5" /> : row.delta < 0 ? <TrendingDown className="h-3.5 w-3.5" /> : <Minus className="h-3.5 w-3.5" />}
-                                  {row.delta > 0 ? `+${row.delta}` : row.delta}
-                                </span>
-                              </td>
-                            </tr>
+                                <p className="text-xs text-muted-foreground">Rating {row.rating} · {row.xp.toLocaleString()} XP</p>
+                              </div>
+                              <span className={`font-mono text-xs font-bold ${row.delta >= 0 ? "text-success" : "text-destructive"}`}>
+                                {row.delta >= 0 ? `+${row.delta}` : row.delta}
+                              </span>
+                            </li>
                           );
                         })
                       )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* Mobile view */}
-                <ul className="divide-y divide-border md:hidden">
-                  {leaderboardData.length === 0 ? (
-                    <li className="py-8 text-center text-muted-foreground">No active participants.</li>
-                  ) : (
-                    leaderboardData.map((row) => {
-                      const isSelf = user && row.username === user.username;
-                      const tier = getDivisionTier(row.rating, row.rank);
-                      return (
-                        <li
-                          key={row.username}
-                          onClick={() => navigate(`/app/profile/${row.username}`)}
-                          className={`flex items-center gap-3 p-4 hover:bg-zinc-900/20 cursor-pointer transition-colors ${isSelf ? "bg-[#FF6500]/5 border-l-2 border-l-[#FF6500]" : ""}`}
-                        >
-                          <span className={`w-8 font-mono text-center font-bold text-xs ${
-                            row.rank === 1 ? "text-yellow-500" :
-                            row.rank === 2 ? "text-zinc-300" :
-                            row.rank === 3 ? "text-amber-600" :
-                            "text-muted-foreground"
-                          }`}>
-                            #{row.rank}
-                          </span>
-                          <Avatar className="h-9 w-9 border border-border shrink-0">
-                            <AvatarImage src={row.avatar} />
-                            <AvatarFallback className="text-[10px] bg-zinc-800 text-zinc-300 font-bold">
-                              {row.username.slice(0, 2).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <p className="truncate text-sm font-semibold text-white">@{row.username}</p>
-                              <Badge variant="outline" className={`font-mono text-[8px] px-1 border shrink-0 ${tier.color}`}>
-                                {tier.name.split(" ")[0]}
-                              </Badge>
-                            </div>
-                            <p className="text-xs text-muted-foreground">Rating {row.rating} · {row.xp.toLocaleString()} XP</p>
-                          </div>
-                          <span className={`font-mono text-xs font-bold ${row.delta >= 0 ? "text-success" : "text-destructive"}`}>
-                            {row.delta >= 0 ? `+${row.delta}` : row.delta}
-                          </span>
-                        </li>
-                      );
-                    })
-                  )}
-                </ul>
-              </Card>
-            </TabsContent>
-          ))}
-        </Tabs>
-        </div>{/* end px-4 md:px-8 wrapper */}
+                    </ul>
+                  </Card>
+                </TabsContent>
+              ))}
+            </Tabs>
+            </div>{/* end px-4 md:px-8 wrapper */}
+          </>
+        )}
       </div>{/* end outer spacer */}
     </AppShell>
   );

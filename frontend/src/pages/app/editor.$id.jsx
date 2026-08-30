@@ -74,6 +74,8 @@ import EnvironmentInfo from "./editor/EnvironmentInfo";
 import ConsoleOutput from "./editor/ConsoleOutput";
 import { DragHandle, VerticalDragHandle } from "./editor/DragHandles";
 import { BrowserPreview } from "./editor/BrowserPreview";
+import { DatabaseSchemaViewer } from "./editor/DatabaseSchemaViewer";
+import { QueryResultTable } from "./editor/QueryResultTable";
 import {
   LANG_LABEL,
   LANG_BADGE,
@@ -219,7 +221,18 @@ function EditorPage() {
   const detailError = useSelector(selectDetailError);
   const runtimeEditor = c?.runtime_config?.editor;
 
+  const isDatabaseDomain = c?.domain === "Databases" || c?.runtime === "database";
+
   const availableLangs = useMemo(() => {
+    if (isDatabaseDomain) {
+      if (c?.starter_code) {
+        const keys = Object.keys(c.starter_code);
+        const DB_ORDER = ["sql", "postgresql", "mysql", "sqlite", "mongodb", "redis"];
+        const found = DB_ORDER.filter((k) => keys.includes(k));
+        if (found.length > 0) return found;
+      }
+      return ["sql", "postgresql", "mysql", "sqlite"];
+    }
     if (runtimeEditor?.mode === "files") {
       return [runtimeEditor.executionLanguage || "multi"];
     }
@@ -243,10 +256,10 @@ function EditorPage() {
       return ["ts", "js", "py", "go", "java", "cpp", "rust"];
     }
     return ["ts", "js", "py", "go"];
-  }, [c, runtimeEditor]);
+  }, [c, runtimeEditor, isDatabaseDomain]);
 
   const availableDbs = useMemo(() => {
-    if (!c?.starter_code) return [];
+    if (isDatabaseDomain || !c?.starter_code) return [];
     const keys = Object.keys(c.starter_code);
     const KNOWN_DBS = ["sqlite", "mongodb", "postgres", "mysql"];
     const found = new Set();
@@ -256,10 +269,19 @@ function EditorPage() {
       });
     });
     return Array.from(found);
-  }, [c]);
+  }, [c, isDatabaseDomain]);
 
   const getInitialState = () => {
     let initialLang = "ts";
+    if (isDatabaseDomain) {
+      const keys = Object.keys(c?.starter_code || {});
+      const DB_ORDER = ["sql", "postgresql", "mysql", "sqlite", "mongodb", "redis"];
+      const firstEngine = DB_ORDER.find((k) => keys.includes(k)) || "sql";
+      return {
+        lang: firstEngine,
+        code: getStarter(slug, firstEngine, c)
+      };
+    }
     // If the runtime config specifies an execution language (e.g. "multi" for DevOps, "html" for Frontend),
     // use that first — it takes priority over starter_code key inference.
     if (runtimeEditor?.executionLanguage) {
@@ -278,7 +300,7 @@ function EditorPage() {
       }
     }
     // Only pass "sqlite" default for DB-related domains, not for algorithm/cli challenges
-    const isDbDomain = c?.domain === "Databases" || c?.domain === "APIs";
+    const isDbDomain = c?.domain === "APIs";
     const defaultDb = isDbDomain ? "sqlite" : undefined;
     return {
       lang: initialLang,
@@ -301,7 +323,7 @@ function EditorPage() {
   const [selectedTestCaseIdx, setSelectedTestCaseIdx] = useState(0);
 
   // Derive isMultiFileDomain from live `c` — NOT from stale useState so first-visit always works
-  const isMultiFileDomain = !!(c?.runtime_config?.capabilities?.filesystem);
+  const isMultiFileDomain = !!(c?.runtime_config?.capabilities?.filesystem) || c?.domain === "Frontend" || lang === "html" || !!(c?.starter_code?.multi) || !!(c?.starter_code?.html);
   // Track whether we have already seeded the initial code/lang from the challenge data
   const initializedForSlug = useRef(null);
 
@@ -510,7 +532,10 @@ function EditorPage() {
     
     if (isMultiFileDomain) {
       try {
-        const parsed = JSON.parse(code);
+        let parsed = JSON.parse(code);
+        if (typeof parsed === "string") {
+          try { parsed = JSON.parse(parsed); } catch (e) {}
+        }
         if (parsed && typeof parsed === "object") {
           setMultiFiles(parsed);
           const keys = Object.keys(parsed);
@@ -953,14 +978,23 @@ function EditorPage() {
                 variant="outline"
                 size="icon"
                 className="xl:hidden h-8 w-8"
-                aria-label="Open browser preview"
+                aria-label={isDatabaseDomain ? "Open schema inspector" : "Open browser preview"}
               >
-                <Globe className="h-4 w-4" />
+                {isDatabaseDomain ? <Database className="h-4 w-4" /> : <Globe className="h-4 w-4" />}
               </Button>
             </DrawerTrigger>
             <DrawerContent className="p-0">
               <div className="flex h-[85vh] flex-col overflow-hidden">
-                <BrowserPreview domain={c.domain} slug={c.slug} title={c.title} code={code} execState={execState} isMultiFileDomain={isMultiFileDomain} onConsoleLog={onConsoleLog} />
+                {isDatabaseDomain ? (
+                  <DatabaseSchemaViewer
+                    schemaSql={c?.schema_sql}
+                    fixtures={c?.fixtures}
+                    schemaJson={c?.schema_json}
+                    domain={c?.domain}
+                  />
+                ) : (
+                  <BrowserPreview domain={c.domain} slug={c.slug} title={c.title} code={code} execState={execState} isMultiFileDomain={isMultiFileDomain} onConsoleLog={onConsoleLog} />
+                )}
               </div>
             </DrawerContent>
           </Drawer>
@@ -1527,12 +1561,21 @@ function EditorPage() {
             <DragHandle onDelta={onDragRight} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
           </div>
 
-          {/* RIGHT: browser preview */}
+          {/* RIGHT: browser preview or database schema inspector */}
           <aside
             className={`hidden h-full flex-col overflow-hidden bg-card xl:flex ${isDraggingAny ? "pointer-events-none" : ""}`}
             style={{ width: rightW, minWidth: MIN_COL, flexShrink: 0 }}
           >
-            <BrowserPreview domain={c.domain} slug={c.slug} title={c.title} code={code} execState={execState} isMultiFileDomain={isMultiFileDomain} onConsoleLog={onConsoleLog} />
+            {isDatabaseDomain ? (
+              <DatabaseSchemaViewer
+                schemaSql={c?.schema_sql}
+                fixtures={c?.fixtures}
+                schemaJson={c?.schema_json}
+                domain={c?.domain}
+              />
+            ) : (
+              <BrowserPreview domain={c.domain} slug={c.slug} title={c.title} code={code} execState={execState} isMultiFileDomain={isMultiFileDomain} onConsoleLog={onConsoleLog} />
+            )}
           </aside>
         </div>
       )}

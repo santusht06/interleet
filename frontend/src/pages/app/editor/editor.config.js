@@ -21,11 +21,22 @@ export const LANG_TO_MONACO = {
   shell: "shell", yaml: "yaml", dockerfile: "dockerfile", plaintext: "plaintext",
   javascript: "javascript", typescript: "typescript", python: "python",
   multi: "shell",
+  sql: "sql", sqlite: "sql", postgresql: "sql", mysql: "sql",
+  mongodb: "json", redis: "plaintext",
 };
 
-export const LANG_LABEL = { ts: "TypeScript", js: "JavaScript", py: "Python", go: "Go", java: "Java", cpp: "C++", rust: "Rust" };
-export const LANG_BADGE = { ts: "node v20.10", js: "node v20.10", py: "python 3.12", go: "go 1.22", java: "openjdk 21", cpp: "gcc 13.2", rust: "rustc 1.75" };
-export const LANG_FILE = { ts: "solution.ts", js: "solution.js", py: "solution.py", go: "main.go", java: "Solution.java", cpp: "solution.cpp", rust: "solution.rs" };
+export const LANG_LABEL = {
+  ts: "TypeScript", js: "JavaScript", py: "Python", go: "Go", java: "Java", cpp: "C++", rust: "Rust",
+  sql: "SQL", sqlite: "SQLite", postgresql: "PostgreSQL", mysql: "MySQL", mongodb: "MongoDB", redis: "Redis"
+};
+export const LANG_BADGE = {
+  ts: "node v20.10", js: "node v20.10", py: "python 3.12", go: "go 1.22", java: "openjdk 21", cpp: "gcc 13.2", rust: "rustc 1.75",
+  sql: "sql", sqlite: "sqlite 3.45", postgresql: "postgres 16", mysql: "mysql 8.0", mongodb: "mongodb 7.0", redis: "redis 7.2"
+};
+export const LANG_FILE = {
+  ts: "solution.ts", js: "solution.js", py: "solution.py", go: "main.go", java: "Solution.java", cpp: "solution.cpp", rust: "solution.rs",
+  sql: "solution.sql", sqlite: "solution.sql", postgresql: "solution.sql", mysql: "solution.sql", mongodb: "solution.json", redis: "solution.txt"
+};
 
 export const BACKEND_LANG_TO_SHORT = {
   typescript: "ts",
@@ -37,6 +48,12 @@ export const BACKEND_LANG_TO_SHORT = {
   java: "java",
   multi: "multi",
   html: "html",
+  sql: "sql",
+  sqlite: "sqlite",
+  postgresql: "postgresql",
+  mysql: "mysql",
+  mongodb: "mongodb",
+  redis: "redis",
 };
 
 // All starter codes are served dynamically from the MongoDB database table.

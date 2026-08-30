@@ -245,12 +245,13 @@ async def get_my_submission(
     Used by the editor to show an "Already Attempted" banner and pre-fill code.
     """
     user_doc = user_auth.get("user")
-    user_id = str(user_doc["user_id"])
+    user_id = user_doc.get("user_id")
+    uid_filter = {"$in": [user_id, str(user_id), int(user_id)]} if str(user_id).isdigit() else user_id
     db = get_db()
 
     # Find the most recent submission for this user+slug, any verdict
     submission = await db.submissions.find_one(
-        {"user_id": user_id, "problem_slug": problem_slug},
+        {"user_id": uid_filter, "problem_slug": problem_slug},
         {"_id": 0},
         sort=[("created_at", -1)],
     )
@@ -260,7 +261,7 @@ async def get_my_submission(
 
     # Also check if there's an accepted submission
     accepted = await db.submissions.find_one(
-        {"user_id": user_id, "problem_slug": problem_slug, "status": "accepted"},
+        {"user_id": uid_filter, "problem_slug": problem_slug, "status": "accepted"},
         {"_id": 0},
         sort=[("created_at", -1)],
     )

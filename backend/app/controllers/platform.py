@@ -138,9 +138,10 @@ class PlatformController:
             }
 
         user_id = user_doc["user_id"]
+        uid_query = {"$in": [user_id, str(user_id), int(user_id)]} if str(user_id).isdigit() else user_id
         
         # 1. Fetch user's submissions
-        submissions_cursor = db.submissions.find({"user_id": user_id})
+        submissions_cursor = db.submissions.find({"user_id": uid_query})
         submissions = await submissions_cursor.to_list(length=1000)
         
         # Filter accepted submissions
@@ -204,13 +205,13 @@ class PlatformController:
         # Heatmap contributions — 365 days for full-year LeetCode-style view
         cutoff_date = datetime.utcnow() - timedelta(days=365)
         sub_activity_cursor = db.submissions.find({
-            "user_id": user_id,
+            "user_id": uid_query,
             "created_at": {"$gte": cutoff_date}
         })
         sub_activities = await sub_activity_cursor.to_list(length=2000)
         
         rep_activity_cursor = db.interview_reports.find({
-            "user_id": user_id,
+            "user_id": uid_query,
             "created_at": {"$gte": cutoff_date}
         })
         rep_activities = await rep_activity_cursor.to_list(length=500)
@@ -487,25 +488,31 @@ class PlatformController:
 
     @staticmethod
     async def leaderboard(page: int = 1, limit: int = 25, q: str | None = None):
-        # Query users from MongoDB users collection
+        # 1. Clean up legacy fake seed users if any remain in MongoDB
+        fake_usernames = ["amelia.dev", "kenji_w", "priya.s", "lucasf", "noor.k", "aria.j"]
+        await db.users.delete_many({"username": {"$in": fake_usernames}})
+
+        # 2. Count registered real users from MongoDB users collection
         cursor = db.users.find({"is_active": {"$ne": False}})
         users = await cursor.to_list(length=1000)
-        
-        # If only 1 or 2 users exist in the DB, seed other participants to make the arena active
-        if len(users) <= 2:
-            seed_users = [
-                {"user_id": str(uuid4()), "username": "amelia.dev", "full_name": "Amelia Dev", "rating": 2843, "total_xp": 184200, "country": "US", "delta": 24, "badges": ["Top 1%", "DevOps"], "email": "amelia@example.com"},
-                {"user_id": str(uuid4()), "username": "kenji_w", "full_name": "Kenji Watanabe", "rating": 2790, "total_xp": 172480, "country": "JP", "delta": 12, "badges": ["Top 1%"], "email": "kenji@example.com"},
-                {"user_id": str(uuid4()), "username": "priya.s", "full_name": "Priya Sharma", "rating": 2755, "total_xp": 168120, "country": "IN", "delta": -3, "badges": ["Backend"], "email": "priya@example.com"},
-                {"user_id": str(uuid4()), "username": "lucasf", "full_name": "Lucas Ferraz", "rating": 2710, "total_xp": 161300, "country": "BR", "delta": 8, "badges": ["System Design"], "email": "lucas@example.com"},
-                {"user_id": str(uuid4()), "username": "noor.k", "full_name": "Noor Khan", "rating": 2682, "total_xp": 158020, "country": "AE", "delta": 5, "badges": ["APIs"], "email": "noor@example.com"},
-                {"user_id": str(uuid4()), "username": "aria.j", "full_name": "Aria Jeong", "rating": 2654, "total_xp": 152410, "country": "KR", "delta": 0, "badges": ["Frontend"], "email": "aria@example.com"}
-            ]
-            for su in seed_users:
-                await db.users.update_one({"username": su["username"]}, {"$set": su}, upsert=True)
-            cursor = db.users.find({"is_active": {"$ne": False}})
-            users = await cursor.to_list(length=1000)
-            
+        total_users = len(users)
+
+        MIN_ONBOARDED_USERS = 20
+
+        # 3. Lock leaderboard until at least 20 real users onboard
+        if total_users < MIN_ONBOARDED_USERS:
+            return {
+                "locked": True,
+                "unlocked": False,
+                "users_count": total_users,
+                "target_users": MIN_ONBOARDED_USERS,
+                "items": [],
+                "total": 0,
+                "page": page,
+                "limit": limit,
+                "message": f"Leaderboard is locked until {MIN_ONBOARDED_USERS} real users onboard. Current progress: {total_users}/{MIN_ONBOARDED_USERS} users."
+            }
+
         items = []
         for u in users:
             user_id = u["user_id"]
@@ -533,7 +540,6 @@ class PlatformController:
             spent_xp = u.get("spent_xp", 0)
             xp = max(0, base_xp + sys_design_xp - spent_xp)
             
-            # Fall back to user document details if no calculated progress (e.g. for mock seeded users)
             if xp == 0:
                 xp = u.get("total_xp") or u.get("xp") or 0
                 
@@ -588,6 +594,10 @@ class PlatformController:
         paginated_items = items[start:end]
         
         return {
+            "locked": False,
+            "unlocked": True,
+            "users_count": total_users,
+            "target_users": MIN_ONBOARDED_USERS,
             "items": paginated_items,
             "total": total,
             "page": page,

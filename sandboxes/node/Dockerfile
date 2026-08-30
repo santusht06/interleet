@@ -4,9 +4,10 @@
 # ─────────────────────────────────────────────
 FROM node:20-alpine
 
-# Disable npm update nags
+# Disable npm update nags & configure global module path
 ENV NPM_CONFIG_UPDATE_NOTIFIER=false \
-    NODE_ENV=production
+    NODE_ENV=production \
+    NODE_PATH=/node_modules
 
 # Install sqlite and redis for Phase 4.1 Database Mocking
 RUN apk add --no-cache sqlite redis
@@ -14,7 +15,7 @@ RUN apk add --no-cache sqlite redis
 # Install common modules in the root /node_modules via a temp directory
 WORKDIR /tmp/deps
 RUN npm init -y && \
-    npm install lodash axios redis ws uuid jsdom express sqlite3 mongodb pg mysql2 jsonwebtoken bcryptjs cors dotenv && \
+    npm install lodash axios redis ws uuid jsdom express sqlite3 mongodb mongoose pg mysql2 jsonwebtoken bcryptjs cors dotenv body-parser morgan zod joi && \
     mv node_modules /node_modules && \
     cd / && rm -rf /tmp/deps
 

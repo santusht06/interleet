@@ -110,7 +110,7 @@ class ExecutorFactory:
             return BrowserExecutor()
 
         # 4. HTTP/Service Evaluation Mode
-        if execution_mode == "http":
+        if execution_mode in ("http", "service"):
             from app.engine.executors.service_executor import ServiceExecutor
             return ServiceExecutor(language)
 

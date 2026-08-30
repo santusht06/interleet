@@ -161,7 +161,10 @@ async function main() {
   const healthType = health.type || 'http';
   const healthPath = health.path || '/health';
 
-  const env = Object.assign({}, process.env, { PORT: port });
+  const env = Object.assign({}, process.env, {
+    PORT: port,
+    NODE_PATH: process.env.NODE_PATH || '/node_modules'
+  });
 
   const dbProcesses = [];
 

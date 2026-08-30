@@ -46,6 +46,9 @@ def main():
     env = dict(os.environ)
     env["PORT"] = str(port)
 
+    if isinstance(cmd, list):
+        cmd = [c.replace("{PORT}", str(port)).replace("$PORT", str(port)) if isinstance(c, str) else c for c in cmd]
+
     # ── Phase 4.1 Database Mocking ──
     db_processes = []
     
@@ -94,9 +97,30 @@ def main():
             else:
                 logs.append(f"Warning: SQLite seed file {seed_file} not found.")
 
-    # Write a simple shell wrapper to ensure command is found
-    # If cmd is an array, we execute it directly
-    logs.append(f"Starting server with PORT={port}...")
+    # Auto-detect FastAPI or Flask if command is standard python execution without custom entrypoint
+    if isinstance(cmd, list) and len(cmd) >= 2 and cmd[0].startswith("python"):
+        target_file = cmd[1]
+        full_target = os.path.join(workspace_dir, target_file)
+        if os.path.exists(full_target):
+            try:
+                with open(full_target, "r", encoding="utf-8", errors="ignore") as tf:
+                    content = tf.read()
+                if "FastAPI" in content and "app = FastAPI" in content and "uvicorn.run" not in content:
+                    module_name = os.path.splitext(target_file)[0]
+                    cmd = ["python3", "-m", "uvicorn", f"{module_name}:app", "--host", "0.0.0.0", "--port", str(port)]
+                    logs.append(f"Auto-detected FastAPI app. Starting Uvicorn on port {port}...")
+                elif "Flask" in content and "app = Flask" in content and "app.run" not in content:
+                    module_name = os.path.splitext(target_file)[0]
+                    cmd = ["python3", "-m", "flask", "--app", f"{module_name}:app", "run", "--host", "0.0.0.0", "--port", str(port)]
+                    logs.append(f"Auto-detected Flask app. Starting Flask on port {port}...")
+            except Exception as e:
+                logs.append(f"Auto-detect warning: {e}")
+
+    # Substitute port in command arguments
+    if isinstance(cmd, list):
+        cmd = [str(c).replace("{PORT}", str(port)).replace("$PORT", str(port)) for c in cmd]
+
+    logs.append(f"Starting server with PORT={port} (cmd={' '.join(cmd)})...")
     try:
         process = subprocess.Popen(
             cmd,
@@ -139,6 +163,10 @@ def main():
         process.terminate()
         stdout, stderr = process.communicate()
         logs.append(f"Server failed to start or pass health check within 15 seconds.")
+        if stderr and stderr.strip():
+            logs.append(f"--- Server STDERR ---\n{stderr.strip()}")
+        if stdout and stdout.strip():
+            logs.append(f"--- Server STDOUT ---\n{stdout.strip()}")
         
         for p in db_processes:
             try:

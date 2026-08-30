@@ -69,13 +69,19 @@ class ServiceExecutor(BaseExecutor):
             except Exception:
                 await super()._write_code(workspace, code, time_limit=time_limit)
         else:
-            # Plain code string
             await super()._write_code(workspace, code, time_limit=time_limit)
 
+        # Determine command for running the service
+        user_cmd = self.user_run_command
+        if self.language == Language.PYTHON:
+            if "FastAPI" in code and "uvicorn.run" not in code:
+                user_cmd = ["python3", "-m", "uvicorn", "solution:app", "--host", "0.0.0.0", "--port", "{PORT}"]
+            elif "Flask" in code and "app.run" not in code:
+                user_cmd = ["python3", "-m", "flask", "--app", "solution:app", "run", "--host", "0.0.0.0", "--port", "{PORT}"]
+
         # Build runtime.json configuration
-        # Extract the user command array into a string or pass as array
         runtime_config = {
-            "command": self.user_run_command,
+            "command": user_cmd,
             "health": {
                 "type": "http",
                 "path": "/health"

@@ -209,9 +209,29 @@ def execute_mongodb(query_str: str, schema_json: dict = None, fixtures: dict = N
             parsed = ast.literal_eval(query_clean)
 
         if isinstance(parsed, list):
-            # Default collection is first fixture collection or 'collection'
-            coll_name = list(fixtures.keys())[0] if (fixtures and isinstance(fixtures, dict)) else "collection"
+            # Intelligently determine base collection:
+            # 1. Exclude collections referenced in $lookup stages as foreign tables
+            lookup_froms = set()
+            for stage in parsed:
+                if isinstance(stage, dict) and "$lookup" in stage and isinstance(stage["$lookup"], dict):
+                    lookup_froms.add(stage["$lookup"].get("from"))
+            
+            candidate_colls = [c for c in (fixtures.keys() if fixtures else []) if c not in lookup_froms]
+            coll_name = candidate_colls[0] if candidate_colls else (list(fixtures.keys())[0] if fixtures else "collection")
+            
             result = list(db[coll_name].aggregate(parsed))
+            
+            # 2. If result is empty and there are multiple fixture collections, try other collections
+            if not result and fixtures and len(fixtures) > 1:
+                for alt_coll in fixtures.keys():
+                    if alt_coll != coll_name:
+                        try:
+                            alt_res = list(db[alt_coll].aggregate(parsed))
+                            if alt_res:
+                                result = alt_res
+                                break
+                        except Exception:
+                            pass
         elif isinstance(parsed, dict):
             coll_name = parsed.get("collection") or (list(fixtures.keys())[0] if fixtures else "collection")
             if "pipeline" in parsed:

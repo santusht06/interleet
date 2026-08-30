@@ -152,7 +152,6 @@ _LANG_RULES: dict[str, list[tuple[str, str]]] = {
 _UNIVERSAL_BLOCKED = [
     (r"/etc/passwd",                      "Access to system files is not allowed"),
     (r"/proc/self",                       "Access to /proc/self is not allowed"),
-    (r"127\.0\.0\.1|localhost",           "Localhost network access is not allowed"),
 ]
 
 

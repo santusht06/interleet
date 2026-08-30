@@ -36,6 +36,8 @@ class Language(str, Enum):
     MYSQL = "mysql"
     MONGODB = "mongodb"
     REDIS = "redis"
+    BASH = "bash"
+    SHELL = "shell"
 
 
 class Verdict(str, Enum):

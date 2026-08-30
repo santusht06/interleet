@@ -32,7 +32,16 @@ RUN apk add --no-cache \
     zip \
     unzip \
     ansible \
-    kubectl
+    kubectl \
+    gettext \
+    python3 \
+    py3-pip \
+    gawk \
+    sed \
+    grep \
+    findutils \
+    coreutils \
+    docker-cli
 
 # Install statically compiled Terraform binary
 RUN curl -LO https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip && \

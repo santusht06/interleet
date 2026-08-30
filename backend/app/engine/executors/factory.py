@@ -30,6 +30,7 @@ from app.engine.executors.rust_executor import RustExecutor
 from app.engine.executors.typescript_executor import TypeScriptExecutor
 from app.engine.executors.browser_executor import BrowserExecutor
 from app.engine.executors.database_executor import DatabaseExecutor
+from app.engine.executors.devops_executor import DevOpsExecutor
 
 _REGISTRY: dict[Language, type[BaseExecutor]] = {
     Language.PYTHON: PythonExecutor,
@@ -40,13 +41,15 @@ _REGISTRY: dict[Language, type[BaseExecutor]] = {
     Language.RUST: RustExecutor,
     Language.JAVA: JavaExecutor,
     Language.HTML: BrowserExecutor,
-    Language.MULTI: PythonExecutor,  # Fallback
+    Language.MULTI: DevOpsExecutor,
     Language.SQL: DatabaseExecutor,
     Language.SQLITE: DatabaseExecutor,
     Language.POSTGRESQL: DatabaseExecutor,
     Language.MYSQL: DatabaseExecutor,
     Language.MONGODB: DatabaseExecutor,
     Language.REDIS: DatabaseExecutor,
+    Language.BASH: DevOpsExecutor,
+    Language.SHELL: DevOpsExecutor,
 }
 
 # Language metadata for API responses / UI
@@ -66,6 +69,8 @@ LANGUAGE_META: dict[Language, dict] = {
     Language.MYSQL: {"name": "MySQL", "extension": "sql", "compiled": False},
     Language.MONGODB: {"name": "MongoDB", "extension": "json", "compiled": False},
     Language.REDIS: {"name": "Redis", "extension": "txt", "compiled": False},
+    Language.BASH: {"name": "Bash", "extension": "sh", "compiled": False},
+    Language.SHELL: {"name": "Shell", "extension": "sh", "compiled": False},
 }
 
 

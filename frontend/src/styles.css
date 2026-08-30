@@ -77,50 +77,49 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Light mode (optional). Dark is the default. */
+/* Interleet signature palette: bg=#000000, primary=#FF6500, accents #1E3E62 / #0B192C */
 :root {
   --radius: 0.625rem;
-  --background: oklch(0.99 0.002 250);
-  --foreground: oklch(0.18 0.02 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 260);
-  --panel: oklch(0.975 0.004 250);
-  --panel-foreground: oklch(0.18 0.02 260);
-  --primary: oklch(0.58 0.18 255);
-  --primary-foreground: oklch(0.99 0.002 250);
-  --secondary: oklch(0.95 0.01 260);
-  --secondary-foreground: oklch(0.2 0.02 260);
-  --muted: oklch(0.96 0.008 260);
-  --muted-foreground: oklch(0.52 0.02 260);
-  --accent: oklch(0.95 0.02 260);
-  --accent-foreground: oklch(0.2 0.02 260);
-  --destructive: oklch(0.6 0.21 25);
-  --destructive-foreground: oklch(0.99 0.002 250);
-  --success: oklch(0.66 0.16 150);
-  --success-foreground: oklch(0.12 0.02 150);
-  --warning: oklch(0.78 0.15 80);
-  --warning-foreground: oklch(0.18 0.02 80);
-  --border: oklch(0.9 0.01 260);
-  --input: oklch(0.92 0.01 260);
-  --ring: oklch(0.58 0.18 255);
-  --chart-1: oklch(0.58 0.18 255);
-  --chart-2: oklch(0.66 0.16 150);
-  --chart-3: oklch(0.78 0.15 80);
-  --chart-4: oklch(0.55 0.18 300);
-  --chart-5: oklch(0.6 0.21 25);
-  --sidebar: oklch(0.97 0.006 260);
-  --sidebar-foreground: oklch(0.2 0.02 260);
-  --sidebar-primary: oklch(0.58 0.18 255);
-  --sidebar-primary-foreground: oklch(0.99 0.002 250);
-  --sidebar-accent: oklch(0.94 0.01 260);
-  --sidebar-accent-foreground: oklch(0.2 0.02 260);
-  --sidebar-border: oklch(0.9 0.01 260);
-  --sidebar-ring: oklch(0.58 0.18 255);
+  --background: #000000;
+  --foreground: #FFFFFF;
+  --card: #0A0A0A;
+  --card-foreground: #FFFFFF;
+  --popover: #0A0A0A;
+  --popover-foreground: #FFFFFF;
+  --panel: #141414;
+  --panel-foreground: #FFFFFF;
+  --primary: #FF6500;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1A1A1A;
+  --secondary-foreground: #FFFFFF;
+  --muted: #0F0F0F;
+  --muted-foreground: #A1A1A1;
+  --accent: #1A1A1A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #E84A5F;
+  --destructive-foreground: #FFFFFF;
+  --success: #4FB286;
+  --success-foreground: #06120A;
+  --warning: #FF6500;
+  --warning-foreground: #FFFFFF;
+  --border: #262626;
+  --input: #141414;
+  --ring: #FF6500;
+  --chart-1: #FF6500;
+  --chart-2: #4FB286;
+  --chart-3: #F2C14E;
+  --chart-4: #B8B8B8;
+  --chart-5: #E84A5F;
+  --sidebar: #000000;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #FF6500;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1A1A1A;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #262626;
+  --sidebar-ring: #FF6500;
 }
 
-/* Dark — Interleet palette: bg=#000000, primary=#FF6500, accents #1E3E62 / #0B192C */
 .dark {
   --background: #000000;
   --foreground: #FFFFFF;

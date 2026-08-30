@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
 fix_frontend_starters.py
-Enriches all 50 Frontend challenges in MongoDB (`interleet.problems`) with complete,
-production-grade starter templates (index.html, index.css, index.js) containing clean UI structures,
-custom CSS, and structured JavaScript scaffolds with event handlers and TODO hooks.
+Enriches all 50 Frontend challenges in MongoDB (`interleet.problems`) with clean,
+unsolved starter templates (index.html, index.css, index.js) containing clean UI structures,
+custom CSS styling, and skeletal JavaScript files with DOM selectors and TODO instructions.
 """
 
 import os
@@ -176,41 +176,26 @@ TEMPLATES = {
 }
 .dot.active { background: #ffffff; width: 24px; border-radius: 10px; }
 """,
-        "js": """// State variables
-let currentSlide = 0;
+        "js": """// TODO: Implement Banner Slider Carousel
+// Requirements:
+// 1. Clicking #next-btn should advance to the next slide and update the active dot.
+// 2. Clicking #prev-btn should navigate to previous slide (wrap around to last if on first).
+// 3. Clicking any pagination .dot should navigate directly to that slide.
+// 4. Update the active class on both .slide and .dot elements and shift #slider-track transform.
+
+const track = document.getElementById('slider-track');
 const slides = document.querySelectorAll('.slide');
 const dots = document.querySelectorAll('.dot');
-const track = document.getElementById('slider-track');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 
+let currentSlide = 0;
+
 function updateSlider(index) {
-  currentSlide = index;
-  // Update track position
-  track.style.transform = `translateX(-${currentSlide * 100}%)`;
-  
-  // Update active classes
-  slides.forEach((s, idx) => s.classList.toggle('active', idx === currentSlide));
-  dots.forEach((d, idx) => d.classList.toggle('active', idx === currentSlide));
+  // TODO: Update slider position and active classes
 }
 
-// Event Listeners
-nextBtn.addEventListener('click', () => {
-  const next = (currentSlide + 1) % slides.length;
-  updateSlider(next);
-});
-
-prevBtn.addEventListener('click', () => {
-  const prev = (currentSlide - 1 + slides.length) % slides.length;
-  updateSlider(prev);
-});
-
-dots.forEach((dot, idx) => {
-  dot.addEventListener('click', () => updateSlider(idx));
-});
-
-// Auto-advance every 5 seconds (Optional)
-// setInterval(() => nextBtn.click(), 5000);
+// TODO: Bind click events for prevBtn, nextBtn, and dots
 """
     },
 
@@ -290,42 +275,28 @@ dots.forEach((dot, idx) => {
 .danger-btn { background: #ef4444; color: white; }
 .danger-btn:hover { background: #dc2626; }
 """,
-        "js": """const openBtn = document.getElementById('open-modal-btn');
+        "js": """// TODO: Implement Modal Dialog Box
+// Requirements:
+// 1. Clicking #open-modal-btn should display the modal (remove .hidden from #modal-backdrop).
+// 2. Clicking #close-modal-x or #cancel-btn should hide the modal (add .hidden to #modal-backdrop).
+// 3. Clicking outside the modal container on the backdrop should close it.
+// 4. Pressing the Escape key should close the open modal.
+
+const openBtn = document.getElementById('open-modal-btn');
 const closeX = document.getElementById('close-modal-x');
 const cancelBtn = document.getElementById('cancel-btn');
 const confirmBtn = document.getElementById('confirm-btn');
 const backdrop = document.getElementById('modal-backdrop');
 
 function openModal() {
-  backdrop.classList.remove('hidden');
+  // TODO: Open modal
 }
 
 function closeModal() {
-  backdrop.classList.add('hidden');
+  // TODO: Close modal
 }
 
-openBtn.addEventListener('click', openModal);
-closeX.addEventListener('click', closeModal);
-cancelBtn.addEventListener('click', closeModal);
-
-confirmBtn.addEventListener('click', () => {
-  alert('Action Confirmed!');
-  closeModal();
-});
-
-// Close on backdrop click
-backdrop.addEventListener('click', (e) => {
-  if (e.target === backdrop) {
-    closeModal();
-  }
-});
-
-// Close on Escape key
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && !backdrop.classList.contains('hidden')) {
-    closeModal();
-  }
-});
+// TODO: Bind event listeners
 """
     },
 
@@ -422,7 +393,13 @@ document.addEventListener('keydown', (e) => {
 }
 .hex-display strong { color: #f97316; font-family: monospace; font-size: 1.1rem; }
 """,
-        "js": """const preview = document.getElementById('color-preview');
+        "js": """// TODO: Implement Dynamic Color Picker
+// Requirements:
+// 1. Listening to RGB slider input events should update the #color-preview background.
+// 2. Update the #hex-code text and RGB value labels (#r-val, #g-val, #b-val) dynamically.
+// 3. Clicking #copy-btn should copy the hex code to the clipboard.
+
+const preview = document.getElementById('color-preview');
 const colorInput = document.getElementById('color-input');
 const rSlider = document.getElementById('red-slider');
 const gSlider = document.getElementById('green-slider');
@@ -433,53 +410,11 @@ const bVal = document.getElementById('b-val');
 const hexCode = document.getElementById('hex-code');
 const copyBtn = document.getElementById('copy-btn');
 
-function rgbToHex(r, g, b) {
-  return '#' + [r, g, b].map(x => {
-    const hex = parseInt(x).toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  }).join('').toUpperCase();
+function updateColor() {
+  // TODO: Convert RGB values to Hex, update preview background and text labels
 }
 
-function hexToRgb(hex) {
-  let c = hex.substring(1);
-  if(c.length === 3) c = c.split('').map(x => x + x).join('');
-  const num = parseInt(c, 16);
-  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-}
-
-function updateFromRgb() {
-  const r = rSlider.value;
-  const g = gSlider.value;
-  const b = bSlider.value;
-  rVal.textContent = r;
-  gVal.textContent = g;
-  bVal.textContent = b;
-  const hex = rgbToHex(r, g, b);
-  hexCode.textContent = hex;
-  preview.style.backgroundColor = hex;
-  colorInput.value = hex.toLowerCase();
-}
-
-function updateFromHex(hex) {
-  const { r, g, b } = hexToRgb(hex);
-  rSlider.value = r;
-  gSlider.value = g;
-  bSlider.value = b;
-  rVal.textContent = r;
-  gVal.textContent = g;
-  bVal.textContent = b;
-  hexCode.textContent = hex.toUpperCase();
-  preview.style.backgroundColor = hex;
-}
-
-[rSlider, gSlider, bSlider].forEach(s => s.addEventListener('input', updateFromRgb));
-colorInput.addEventListener('input', (e) => updateFromHex(e.target.value));
-
-copyBtn.addEventListener('click', () => {
-  navigator.clipboard.writeText(hexCode.textContent);
-  copyBtn.textContent = 'Copied!';
-  setTimeout(() => copyBtn.textContent = 'Copy Code', 1500);
-});
+// TODO: Attach event listeners to sliders and copy button
 """
     }
 }
@@ -576,7 +511,12 @@ def generate_default_frontend_starter(slug, title):
 }}
 """
 
-    js = f"""// {component_name} Implementation
+    js = f"""// TODO: Implement {component_name}
+// Requirements:
+// 1. Render and manage interactive elements inside #component-root.
+// 2. Handle user events (clicks, inputs, submissions) and update state.
+// 3. Ensure the UI responds accurately to user actions.
+
 document.addEventListener('DOMContentLoaded', () => {{
   const input = document.getElementById('main-input');
   const submitBtn = document.getElementById('primary-action-btn');
@@ -584,52 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {{
   const listContainer = document.getElementById('items-list');
   const statusIndicator = document.querySelector('.status-indicator');
 
-  let items = [];
-
-  function render() {{
-    listContainer.innerHTML = '';
-    if (items.length === 0) {{
-      listContainer.innerHTML = '<p style="color: #71717a; font-size: 0.85rem;">No items added yet.</p>';
-      return;
-    }}
-
-    items.forEach((item, index) => {{
-      const card = document.createElement('div');
-      card.className = 'item-card';
-      card.innerHTML = `
-        <span>${{item}}</span>
-        <button data-index="${{index}}" style="padding: 4px 8px; font-size: 0.75rem; background: #ef4444;">Delete</button>
-      `;
-      listContainer.appendChild(card);
-    }});
-  }}
-
-  submitBtn.addEventListener('click', () => {{
-    const value = input.value.trim();
-    if (!value) return;
-    items.push(value);
-    input.value = '';
-    statusIndicator.textContent = 'Active (' + items.length + ')';
-    render();
-  }});
-
-  resetBtn.addEventListener('click', () => {{
-    items = [];
-    input.value = '';
-    statusIndicator.textContent = 'Ready';
-    render();
-  }});
-
-  listContainer.addEventListener('click', (e) => {{
-    if (e.target.tagName === 'BUTTON') {{
-      const idx = parseInt(e.target.getAttribute('data-index'), 10);
-      items.splice(idx, 1);
-      statusIndicator.textContent = items.length ? 'Active (' + items.length + ')' : 'Ready';
-      render();
-    }}
-  }});
-
-  render();
+  // Write your component logic below:
 }});
 """
 
@@ -667,7 +562,7 @@ def run():
             {"$set": {"starter_code.html": starter_payload}}
         )
         updated += 1
-        print(f"  [OK] Updated {slug}")
+        print(f"  [OK] Updated unsolved starter for {slug}")
 
     print(f"Done! Successfully updated {updated} Frontend challenges in MongoDB.")
 

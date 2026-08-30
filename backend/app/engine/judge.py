@@ -246,12 +246,12 @@ class JudgeEngine:
                 return False, {"error": "No screenshot captured"}
             return _visual_match(sandbox_result.screenshot_base64, expected)
 
-        # ── JSON Structural Match ─────────────────────────────────────
-        if mode == ComparisonMode.JSON:
-            return _json_match(actual, expected), None
-
         # ── Layer 1: Exact Match ──────────────────────────────────────
         if actual == expected:
+            return True, None
+
+        # Try JSON deep structural match (handles whitespace & 800 == 800.0)
+        if _json_match(actual, expected):
             return True, None
 
         if mode == ComparisonMode.EXACT:

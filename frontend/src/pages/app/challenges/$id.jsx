@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -40,6 +40,9 @@ import {
   Beaker,
   RefreshCw,
   Share2,
+  Code2,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 function ChallengeDetail() {
@@ -238,6 +241,11 @@ function ChallengeDetail() {
             </div>
           </Card>
 
+          {/* ── Starter Code Snippet ─────────────────────────────────── */}
+          {c.starter_code && Object.keys(c.starter_code).length > 0 && (
+            <StarterCodeCard starterCode={c.starter_code} />
+          )}
+
           {c.hints && c.hints.length > 0 && (
             <Card className="border-border bg-card p-6">
               <h3 className="text-sm font-semibold">Hints</h3>
@@ -325,6 +333,81 @@ function ChallengeDetail() {
         </div>
       </div>
     </AppShell>
+  );
+}
+
+// ── Starter Code Snippet Card ──────────────────────────────────────────────
+const LANG_LABEL_MAP = {
+  ts: "TypeScript", typescript: "TypeScript",
+  js: "JavaScript", javascript: "JavaScript",
+  py: "Python",     python: "Python",
+  go: "Go",
+  java: "Java",
+  cpp: "C++",
+  rust: "Rust",
+  html: "HTML/CSS/JS",
+  multi: "Shell",
+};
+
+function StarterCodeCard({ starterCode }) {
+  const allKeys = Object.keys(starterCode);
+  const [activeKey, setActiveKey] = useState(allKeys[0] || "");
+  const [expanded, setExpanded] = useState(true);
+
+  const snippet = starterCode[activeKey] || "";
+  const langLabel = LANG_LABEL_MAP[activeKey] || activeKey;
+
+  return (
+    <Card className="border-border bg-card p-0 overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <Code2 className="h-4 w-4 text-primary" />
+          Starter Code
+        </div>
+        <div className="flex items-center gap-2">
+          {/* Language tabs */}
+          {allKeys.length > 1 && (
+            <div className="flex gap-1">
+              {allKeys.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setActiveKey(k)}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+                    k === activeKey
+                      ? "bg-primary/20 text-primary border border-primary/40"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {LANG_LABEL_MAP[k] || k}
+                </button>
+              ))}
+            </div>
+          )}
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            title={expanded ? "Collapse" : "Expand"}
+          >
+            {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Language badge bar */}
+      <div className="flex items-center gap-2 px-5 pt-3 pb-1">
+        <span className="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-mono border border-primary/20">
+          {langLabel}
+        </span>
+      </div>
+
+      {/* Code block */}
+      {expanded && (
+        <pre className="overflow-x-auto px-5 pb-5 pt-2 font-mono text-xs leading-relaxed text-foreground/85 whitespace-pre">
+          {snippet}
+        </pre>
+      )}
+    </Card>
   );
 }
 

@@ -43,13 +43,98 @@ class DBJsonEncoder(json.JSONEncoder):
             return obj.decode('utf-8', errors='replace')
         return super().default(obj)
 
+# ── SQL Dialect Normalization & Transpiler ────────────────────────────────────
+def normalize_sql_dialect(sql: str) -> str:
+    # 1. INTERVAL arithmetic: col + INTERVAL '1 month' / '1 day' / '1 year'
+    sql = re.sub(
+        r"([\w\.\(\)\|'\-]+)\s*\+\s*INTERVAL\s*['\"]([+-]?\d+)\s*([a-zA-Z]+)['\"]",
+        r"date(\1, '+\2 \3')",
+        sql,
+        flags=re.IGNORECASE
+    )
+    sql = re.sub(
+        r"([\w\.\(\)\|'\-]+)\s*-\s*INTERVAL\s*['\"]([+-]?\d+)\s*([a-zA-Z]+)['\"]",
+        r"date(\1, '-\2 \3')",
+        sql,
+        flags=re.IGNORECASE
+    )
+    # 2. Date modifier without sign: date(col, '1 month') -> date(col, '+1 month')
+    sql = re.sub(
+        r"\bdate\s*\(\s*([^,]+)\s*,\s*['\"](\d+\s*(?:month|day|year|hour|minute|second)s?)['\"]\s*\)",
+        r"date(\1, '+\2')",
+        sql,
+        flags=re.IGNORECASE
+    )
+    # 3. DATE_ADD(col, INTERVAL <num> <unit>) -> date(col, '+<num> <unit>')
+    sql = re.sub(
+        r"\bDATE_ADD\s*\(\s*([^,]+)\s*,\s*INTERVAL\s*['\"]?([+-]?\d+)\s*([a-zA-Z]+)['\"]?\s*\)",
+        r"date(\1, '+\2 \3')",
+        sql,
+        flags=re.IGNORECASE
+    )
+    # 4. DATE_SUB(col, INTERVAL <num> <unit>) -> date(col, '-<num> <unit>')
+    sql = re.sub(
+        r"\bDATE_SUB\s*\(\s*([^,]+)\s*,\s*INTERVAL\s*['\"]?([+-]?\d+)\s*([a-zA-Z]+)['\"]?\s*\)",
+        r"date(\1, '-\2 \3')",
+        sql,
+        flags=re.IGNORECASE
+    )
+    # 5. DATE_TRUNC('month', col) -> strftime('%Y-%m-01', col)
+    sql = re.sub(
+        r"\bDATE_TRUNC\s*\(\s*['\"]month['\"]\s*,\s*([^\)]+)\)",
+        r"strftime('%Y-%m-01', \1)",
+        sql,
+        flags=re.IGNORECASE
+    )
+    # 6. EXTRACT(MONTH/YEAR FROM col)
+    sql = re.sub(
+        r"\bEXTRACT\s*\(\s*month\s+FROM\s+([^\)]+)\)",
+        r"CAST(strftime('%m', \1) AS INTEGER)",
+        sql,
+        flags=re.IGNORECASE
+    )
+    sql = re.sub(
+        r"\bEXTRACT\s*\(\s*year\s+FROM\s+([^\)]+)\)",
+        r"CAST(strftime('%Y', \1) AS INTEGER)",
+        sql,
+        flags=re.IGNORECASE
+    )
+    # 7. Postgres Type Casts (::date, ::text, ::int)
+    sql = re.sub(r"::DATE\b", "", sql, flags=re.IGNORECASE)
+    sql = re.sub(r"::TEXT\b", "", sql, flags=re.IGNORECASE)
+    sql = re.sub(r"::INT(?:EGER)?\b", "", sql, flags=re.IGNORECASE)
+    # 8. ILIKE -> LIKE
+    sql = re.sub(r"\bILIKE\b", "LIKE", sql, flags=re.IGNORECASE)
+    return sql
+
 # ── SQL Execution Engine (SQLite In-Memory with Extended Functions) ───────────
 def execute_sql(query: str, schema_sql: str = "", fixtures: list = None) -> list:
     conn = sqlite3.connect(":memory:")
     conn.row_factory = sqlite3.Row
+    
+    # Register common dialect compatibility functions
+    def to_char(val, fmt=None):
+        if val is None:
+            return None
+        s = str(val)
+        if fmt and ("YYYY-MM" in fmt or "yyyy-mm" in fmt):
+            return s[:7]
+        if fmt and ("YYYY-MM-DD" in fmt or "yyyy-mm-dd" in fmt):
+            return s[:10]
+        return s
+
+    conn.create_function("TO_CHAR", 2, to_char)
+    conn.create_function("to_char", 2, to_char)
+    conn.create_function("NVL", 2, lambda a, b: a if a is not None else b)
+    conn.create_function("nvl", 2, lambda a, b: a if a is not None else b)
+    conn.create_function("CONCAT", -1, lambda *args: "".join(str(a) for a in args if a is not None))
+    conn.create_function("concat", -1, lambda *args: "".join(str(a) for a in args if a is not None))
+    conn.create_function("NOW", 0, lambda: datetime.now().isoformat())
+    conn.create_function("now", 0, lambda: datetime.now().isoformat())
+
     cursor = conn.cursor()
 
-    # Enable foreign keys and advanced SQLite math/string extensions
+    # Enable foreign keys
     cursor.execute("PRAGMA foreign_keys = ON;")
 
     # Run schema setup if provided
@@ -67,10 +152,8 @@ def execute_sql(query: str, schema_sql: str = "", fixtures: list = None) -> list
                     cursor.execute(insert_sql, [r.get(c) for c in cols])
         conn.commit()
 
-    # Execute user query
-    # Support multiple statements (e.g. SET / CTEs / SELECT)
-    clean_query = query.strip()
-    # Remove trailing semicolons for single SELECT
+    # Execute normalized user query
+    clean_query = normalize_sql_dialect(query.strip())
     statements = [s.strip() for s in clean_query.split(";") if s.strip()]
     
     rows_result = []

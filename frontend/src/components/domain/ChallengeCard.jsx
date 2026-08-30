@@ -74,6 +74,9 @@ export function ChallengeCard({ c }) {
   const theme = DOMAIN_THEMES[domain] || DOMAIN_THEMES.Backend;
   const DomainIcon = theme.icon;
 
+  const isSolved = (user?.solved_problems || user?.solved_challenges || []).includes(c.slug) || c.user_status === "solved";
+  const isAttempted = !isSolved && ((user?.attempted_problems || []).includes(c.slug) || c.user_status === "attempted");
+
   const cardContent = (
     <Card className={`relative overflow-hidden h-full flex flex-col justify-between border border-zinc-800 bg-zinc-950/60 backdrop-blur-md p-6 transition-all duration-300 hover:-translate-y-1 ${theme.border} hover:shadow-lg ${theme.glow} group cursor-pointer`}>
       {/* Background Radial Glow on Hover */}
@@ -91,6 +94,16 @@ export function ChallengeCard({ c }) {
             </span>
           </div>
           <div className="flex items-center gap-2">
+            {isSolved && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                <Sparkles className="h-2.5 w-2.5 text-emerald-400" /> Solved
+              </span>
+            )}
+            {isAttempted && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-semibold text-amber-400">
+                <Clock className="h-2.5 w-2.5 text-amber-400" /> Attempted
+              </span>
+            )}
             {c.is_premium && (
               <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 px-2.5 py-0.5 text-[10px] font-bold text-amber-400 border border-amber-500/30 shadow-sm shadow-orange-500/5">
                 <Lock className="h-2.5 w-2.5" /> PRO

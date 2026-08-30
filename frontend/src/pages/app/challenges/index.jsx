@@ -32,7 +32,7 @@ import UpgradeModal from "@/components/UpgradeModal";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, SlidersHorizontal, LayoutGrid, List as ListIcon, RefreshCw, Lock, Shuffle } from "lucide-react";
+import { Search, SlidersHorizontal, LayoutGrid, List as ListIcon, RefreshCw, Lock, Shuffle, Check, Clock } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -61,6 +61,7 @@ function ChallengesPage() {
   const [q, setQ] = useState("");
   const [domain, setDomain] = useState("all");
   const [diff, setDiff] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all"); // "all", "solved", "attempted", "todo"
   const [sort, setSort] = useState("popular");
   const [view, setView] = useState("grid");
 
@@ -87,6 +88,9 @@ function ChallengesPage() {
   useEffect(() => {
     let filtered = [...items];
 
+    const solvedSlugs = new Set(user?.solved_problems || user?.solved_challenges || []);
+    const attemptedSlugs = new Set(user?.attempted_problems || []);
+
     // 1. Search Query
     const term = q.trim().toLowerCase();
     if (term) {
@@ -106,14 +110,31 @@ function ChallengesPage() {
       filtered = filtered.filter((c) => c.difficulty === diff);
     }
 
-    // 4. Premium/Free filter
+    // 4. Status Filter (Solved / Attempted / Todo)
+    if (statusFilter === "solved") {
+      filtered = filtered.filter((c) => solvedSlugs.has(c.slug) || c.user_status === "solved");
+    } else if (statusFilter === "attempted") {
+      filtered = filtered.filter((c) => {
+        const isSolved = solvedSlugs.has(c.slug) || c.user_status === "solved";
+        const isAttempted = attemptedSlugs.has(c.slug) || c.user_status === "attempted";
+        return isAttempted && !isSolved;
+      });
+    } else if (statusFilter === "todo") {
+      filtered = filtered.filter((c) => {
+        const isSolved = solvedSlugs.has(c.slug) || c.user_status === "solved";
+        const isAttempted = attemptedSlugs.has(c.slug) || c.user_status === "attempted";
+        return !isSolved && !isAttempted;
+      });
+    }
+
+    // 5. Premium/Free filter
     if (premiumFilter === "free") {
       filtered = filtered.filter((c) => !c.is_premium);
     } else if (premiumFilter === "premium") {
       filtered = filtered.filter((c) => c.is_premium);
     }
 
-    // 5. Estimated Time duration filter (resilient for minutes / estimated_time_minutes keys)
+    // 6. Estimated Time duration filter
     if (timeFilter === "quick") {
       filtered = filtered.filter((c) => (c.minutes || c.estimated_time_minutes || 0) < 45);
     } else if (timeFilter === "medium") {
@@ -125,13 +146,13 @@ function ChallengesPage() {
       filtered = filtered.filter((c) => (c.minutes || c.estimated_time_minutes || 0) > 90);
     }
 
-    // 6. Target Audience filter
+    // 7. Target Audience filter
     if (beginnerFilter === "beginner") {
       filtered = filtered.filter((c) => c.recommended_for_beginner || c.difficulty === "Easy");
     }
 
     setDisplayedItems(filtered);
-  }, [items, q, domain, diff, premiumFilter, timeFilter, beginnerFilter]);
+  }, [items, q, domain, diff, statusFilter, premiumFilter, timeFilter, beginnerFilter, user]);
 
   // Fetch challenges from backend only when parameters or debounced query changes
   useEffect(() => {
@@ -308,6 +329,18 @@ function ChallengesPage() {
               </SelectContent>
             </Select>
 
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-9 w-[130px]">
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All status</SelectItem>
+                <SelectItem value="solved">Solved</SelectItem>
+                <SelectItem value="attempted">Attempted</SelectItem>
+                <SelectItem value="todo">Todo</SelectItem>
+              </SelectContent>
+            </Select>
+
             <Select value={sort} onValueChange={setSort}>
               <SelectTrigger className="h-9 w-[140px]">
                 <SelectValue placeholder="Sort" />
@@ -444,6 +477,7 @@ function ChallengesPage() {
                 <tr>
                   <th className="px-3 py-2 font-mono uppercase tracking-wider md:px-4">Title</th>
                   <th className="px-3 py-2 font-mono uppercase tracking-wider md:px-4">Domain</th>
+                  <th className="px-3 py-2 font-mono uppercase tracking-wider md:px-4">Status</th>
                   <th className="px-3 py-2 font-mono uppercase tracking-wider md:px-4">
                     Difficulty
                   </th>
@@ -459,37 +493,56 @@ function ChallengesPage() {
                 </tr>
               </thead>
               <tbody>
-                {displayedItems.map((c) => (
-                  <tr
-                    key={c.id || c.slug}
-                    role="link"
-                    tabIndex={0}
-                    aria-label={`Open challenge ${c.title}`}
-                    onClick={() => openChallenge(c)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        openChallenge(c);
-                      }
-                    }}
-                    className="cursor-pointer border-t border-border hover:bg-accent/40 focus-visible:bg-accent/40"
-                  >
-                    <td className="px-3 py-3 font-medium md:px-4">
-                      <div className="flex items-center gap-1.5">
-                        <span className="truncate">{c.title}</span>
-                      </div>
-                    </td>
-                    <td className="px-3 py-3 md:px-4">
-                      <DomainTag d={c.domain} />
-                    </td>
-                    <td className="px-3 py-3 md:px-4">
-                      <DifficultyPill d={c.difficulty} />
-                    </td>
-                    <td className="hidden px-4 py-3 font-mono md:table-cell">{c.xp}</td>
-                    <td className="hidden px-4 py-3 font-mono md:table-cell">{c.minutes}m</td>
-                    <td className="hidden px-4 py-3 font-mono md:table-cell">{c.completion}%</td>
-                  </tr>
-                ))}
+                {displayedItems.map((c) => {
+                  const isSolved = (user?.solved_problems || user?.solved_challenges || []).includes(c.slug) || c.user_status === "solved";
+                  const isAttempted = !isSolved && ((user?.attempted_problems || []).includes(c.slug) || c.user_status === "attempted");
+                  return (
+                    <tr
+                      key={c.id || c.slug}
+                      role="link"
+                      tabIndex={0}
+                      aria-label={`Open challenge ${c.title}`}
+                      onClick={() => openChallenge(c)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          openChallenge(c);
+                        }
+                      }}
+                      className="cursor-pointer border-t border-border hover:bg-accent/40 focus-visible:bg-accent/40"
+                    >
+                      <td className="px-3 py-3 font-medium md:px-4">
+                        <div className="flex items-center gap-1.5">
+                          <span className="truncate">{c.title}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-3 md:px-4">
+                        <DomainTag d={c.domain} />
+                      </td>
+                      <td className="px-3 py-3 md:px-4">
+                        {isSolved ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                            <Check className="h-3 w-3 text-emerald-400" /> Solved
+                          </span>
+                        ) : isAttempted ? (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-semibold text-amber-400">
+                            <Clock className="h-3 w-3 text-amber-400" /> Attempted
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-[11px] text-zinc-500 font-mono">
+                            —
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 md:px-4">
+                        <DifficultyPill d={c.difficulty} />
+                      </td>
+                      <td className="hidden px-4 py-3 font-mono md:table-cell">{c.xp}</td>
+                      <td className="hidden px-4 py-3 font-mono md:table-cell">{c.minutes}m</td>
+                      <td className="hidden px-4 py-3 font-mono md:table-cell">{c.completion}%</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

@@ -545,11 +545,14 @@ async def _update_user_ratings_and_badges(
         from datetime import datetime, timedelta
         db = get_db()
         
+        uid_filter = {"$in": [user_id, str(user_id), int(user_id)]} if str(user_id).isdigit() else user_id
+
         # 1. Fetch user's submissions
-        submissions_cursor = db.submissions.find({"user_id": user_id})
+        submissions_cursor = db.submissions.find({"user_id": uid_filter})
         submissions = await submissions_cursor.to_list(length=1000)
         accepted_subs = [s for s in submissions if s.get("status") == "accepted"]
         solved_slugs = {s["problem_slug"] for s in accepted_subs if s.get("problem_slug")}
+        attempted_slugs = {s["problem_slug"] for s in submissions if s.get("problem_slug")}
         
         # 2. Fetch all challenges from problems
         problems_cursor = db.problems.find({})
@@ -588,17 +591,18 @@ async def _update_user_ratings_and_badges(
         updates["overall_rating"] = 1000 + solved_count * 100 + int(xp * 0.1)
         updates["total_xp"] = xp
         updates["solved_problems"] = list(solved_slugs)
+        updates["attempted_problems"] = list(attempted_slugs)
         
         # Heatmap
         cutoff = datetime.utcnow() - timedelta(days=182)
         sub_activity_cursor = db.submissions.find({
-            "user_id": user_id,
+            "user_id": uid_filter,
             "created_at": {"$gte": cutoff}
         })
         sub_activities = await sub_activity_cursor.to_list(length=1000)
         
         rep_activity_cursor = db.interview_reports.find({
-            "user_id": user_id,
+            "user_id": uid_filter,
             "created_at": {"$gte": cutoff}
         })
         rep_activities = await rep_activity_cursor.to_list(length=1000)
@@ -611,7 +615,7 @@ async def _update_user_ratings_and_badges(
                 
         updates["streak_count"] = len(heatmap_dates)
         
-        await db.users.update_one({"user_id": user_id}, {"$set": updates})
+        await db.users.update_one({"user_id": uid_filter}, {"$set": updates})
         logger.info("Successfully updated user=%s ratings and streak in DB", user_id)
 
         # ── Award badges via BadgeService (only when a problem was accepted) ──

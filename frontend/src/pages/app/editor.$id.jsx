@@ -60,6 +60,7 @@ import {
   Users,
   BookOpen,
   Globe,
+  Database,
   RotateCw,
   RotateCcw,
   Lock,

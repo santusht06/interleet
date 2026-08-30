@@ -228,8 +228,15 @@ def main():
     else:
         query_code = sys.argv[1] if len(sys.argv) > 1 else ""
 
-    # Read config / schema from stdin
+    # Read config / schema from stdin or stdin.txt file
     stdin_content = sys.stdin.read().strip()
+    if not stdin_content and os.path.exists("stdin.txt"):
+        try:
+            with open("stdin.txt", "r", encoding="utf-8") as f:
+                stdin_content = f.read().strip()
+        except Exception:
+            stdin_content = ""
+
     config = {}
     if stdin_content:
         try:

@@ -62,6 +62,9 @@ def _to_frontend(doc: dict) -> dict:
         "runtime": runtime_id,
         "runtime_config": runtime_config or None,
         "execution_mode": doc.get("execution_mode") or (runtime_config.get("executionMode") if runtime_config else "cli"),
+        "fixtures": doc.get("fixtures", {}),
+        "schema_sql": doc.get("schema_sql", ""),
+        "schema_json": doc.get("schema_json", {}),
     }
 
 

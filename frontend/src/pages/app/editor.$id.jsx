@@ -679,6 +679,15 @@ function EditorPage() {
     }
 
     // ── Single-file domains ────────────────────────────────────────────────────
+    if (isDatabaseDomain) {
+      const dbEngines = ["sql", "postgresql", "mysql", "sqlite", "mongodb", "redis"];
+      const matched = dbEngines.find(k => keys.includes(k)) || "sql";
+      const targetLang = dbEngines.includes(lang) ? lang : matched;
+      setLang(targetLang);
+      setCode(getStarter(slug, targetLang, c));
+      return;
+    }
+
     const shortKeys = keys
       .map(k => k === "typescript" ? "ts" : k === "javascript" ? "js" : k === "python" ? "py"
              : k === "go" ? "go" : k === "cpp" ? "cpp" : k === "rust" ? "rust"

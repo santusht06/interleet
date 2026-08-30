@@ -272,16 +272,42 @@ async function main() {
     process.exit(1);
   }
 
-  logs.push(`Server ready in ${startupTime}ms.`);
+  function extractRequest(item) {
+    if (!item) return { method: 'GET', path: '/health' };
+    if (item.request && typeof item.request === 'object') {
+      return item.request;
+    }
+    return item;
+  }
 
   let requests = [];
   try {
     const rawRequests = fs.readFileSync(`${workspaceDir}/stdin.txt`, 'utf8');
     if (rawRequests.trim()) {
-      requests = JSON.parse(rawRequests);
+      const parsed = JSON.parse(rawRequests);
+      if (Array.isArray(parsed)) {
+        requests = parsed.map(extractRequest);
+      } else if (parsed && typeof parsed === 'object') {
+        if (Array.isArray(parsed.requests)) {
+          requests = parsed.requests.map(extractRequest);
+        } else if (Array.isArray(parsed.test_cases)) {
+          requests = parsed.test_cases.map(extractRequest);
+        } else if (parsed.request && typeof parsed.request === 'object') {
+          requests = [parsed.request];
+        } else if (parsed.method || parsed.path) {
+          requests = [parsed];
+        } else {
+          requests = [{ method: 'GET', path: '/health' }];
+        }
+      }
     }
   } catch (e) {
     logs.push(`Warning: Failed to parse stdin.txt requests: ${e.message}`);
+    requests = [{ method: 'GET', path: '/health' }];
+  }
+
+  if (!Array.isArray(requests) || requests.length === 0) {
+    requests = [{ method: 'GET', path: '/health' }];
   }
 
   const context = { responses: [] };

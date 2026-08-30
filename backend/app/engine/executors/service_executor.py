@@ -127,6 +127,11 @@ class ServiceExecutor(BaseExecutor):
                             if "response" in act_res:
                                 act_res["response"]["headers"] = filtered_headers
 
+                        # Only include body in actual if the expected explicitly specifies it
+                        if "body" not in exp_response:
+                            if "response" in act_res:
+                                act_res["response"].pop("body", None)
+
                 # We format the 'stdout' as a JSON string of the responses so JudgeEngine can compare it semantically
                 sr.stdout = json.dumps(responses)
                 

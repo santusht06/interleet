@@ -158,15 +158,39 @@ def main():
 
     logs.append(f"Server ready in {startup_time_ms}ms.")
 
+    def extract_request(item):
+        if not item:
+            return {"method": "GET", "path": "/health"}
+        if isinstance(item, dict) and "request" in item and isinstance(item["request"], dict):
+            return item["request"]
+        return item
+
     # Read requests from stdin.txt
     requests = []
     try:
         with open(f"{workspace_dir}/stdin.txt") as f:
             raw = f.read()
             if raw.strip():
-                requests = json.loads(raw)
+                parsed = json.loads(raw)
+                if isinstance(parsed, list):
+                    requests = [extract_request(i) for i in parsed]
+                elif isinstance(parsed, dict):
+                    if isinstance(parsed.get("requests"), list):
+                        requests = [extract_request(i) for i in parsed["requests"]]
+                    elif isinstance(parsed.get("test_cases"), list):
+                        requests = [extract_request(i) for i in parsed["test_cases"]]
+                    elif isinstance(parsed.get("request"), dict):
+                        requests = [parsed["request"]]
+                    elif "method" in parsed or "path" in parsed:
+                        requests = [parsed]
+                    else:
+                        requests = [{"method": "GET", "path": "/health"}]
     except Exception as e:
         logs.append(f"Warning: Failed to parse stdin.txt requests: {e}")
+        requests = [{"method": "GET", "path": "/health"}]
+
+    if not isinstance(requests, list) or len(requests) == 0:
+        requests = [{"method": "GET", "path": "/health"}]
 
     # Execute requests
     import re

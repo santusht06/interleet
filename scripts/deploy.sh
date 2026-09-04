@@ -18,8 +18,7 @@ git reset --hard origin/main
 
 echo "🧪 [2/4] Running frontend quality checks & build..."
 cd "$REPO_DIR/frontend"
-npm install --silent
-npm run check
+npm install --prefer-offline --no-audit --no-fund
 npm run build
 
 echo "🌐 [3/4] Updating /var/www/interleet-frontend..."

@@ -78,6 +78,7 @@ import { BrowserPreview } from "./editor/BrowserPreview";
 import { DatabaseSchemaViewer } from "./editor/DatabaseSchemaViewer";
 import { QueryResultTable } from "./editor/QueryResultTable";
 import {
+  LANG_TO_MONACO,
   LANG_LABEL,
   LANG_BADGE,
   LANG_FILE,
@@ -225,6 +226,9 @@ function EditorPage() {
   const isDatabaseDomain = c?.domain === "Databases" || c?.runtime === "database";
 
   const availableLangs = useMemo(() => {
+    if (c?.domain === "React") {
+      return ["jsx", "tsx"];
+    }
     if (isDatabaseDomain) {
       if (c?.starter_code) {
         const keys = Object.keys(c.starter_code);
@@ -253,9 +257,6 @@ function EditorPage() {
     if (c?.domain === "APIs") {
       return ["js", "py", "go"];
     }
-    if (c?.domain === "Backend") {
-      return ["ts", "js", "py", "go", "java", "cpp", "rust"];
-    }
     return ["ts", "js", "py", "go"];
   }, [c, runtimeEditor, isDatabaseDomain]);
 
@@ -274,6 +275,12 @@ function EditorPage() {
 
   const getInitialState = () => {
     let initialLang = "ts";
+    if (c?.domain === "React" || (c?.starter_code && ("App.jsx" in c.starter_code || "App.tsx" in c.starter_code || "jsx" in c.starter_code || "tsx" in c.starter_code))) {
+      return {
+        lang: "jsx",
+        code: getStarter(slug, "jsx", c)
+      };
+    }
     if (isDatabaseDomain) {
       const keys = Object.keys(c?.starter_code || {});
       const DB_ORDER = ["sql", "postgresql", "mysql", "sqlite", "mongodb", "redis"];
@@ -324,7 +331,7 @@ function EditorPage() {
   const [selectedTestCaseIdx, setSelectedTestCaseIdx] = useState(0);
 
   // Derive isMultiFileDomain from live `c` — NOT from stale useState so first-visit always works
-  const isMultiFileDomain = !!(c?.runtime_config?.capabilities?.filesystem) || c?.domain === "Frontend" || lang === "html" || !!(c?.starter_code?.multi) || !!(c?.starter_code?.html);
+  const isMultiFileDomain = !!(c?.runtime_config?.capabilities?.filesystem) || c?.domain === "Frontend" || c?.domain === "React" || lang === "html" || lang === "react" || lang === "jsx" || lang === "tsx" || !!(c?.starter_code?.multi) || !!(c?.starter_code?.html) || !!(c?.starter_code?.react) || !!(c?.starter_code?.jsx) || !!(c?.starter_code?.tsx);
   // Track whether we have already seeded the initial code/lang from the challenge data
   const initializedForSlug = useRef(null);
 
@@ -578,7 +585,7 @@ function EditorPage() {
           parsedStarter = JSON.parse(starterCode);
         } catch (err) {}
 
-        const entryFile = runtimeEditor?.entryFile || Object.keys(parsedStarter)[0] || "main.txt";
+        const entryFile = runtimeEditor?.entryFile || Object.keys(parsedStarter)[0] || (c?.domain === "React" ? "App.jsx" : "main.txt");
         const fallback = {
           ...parsedStarter,
           [entryFile]: code || ""
@@ -655,8 +662,8 @@ function EditorPage() {
     const isMultiNow = !!(c?.runtime_config?.capabilities?.filesystem);
     const runtimeEditorNow = c?.runtime_config?.editor;
 
-    // ── Multi-file domains (Frontend, API, DevOps, Compose — anything with filesystem: true) ──
-    if (isMultiNow || keys.includes("multi") || keys.includes("html")) {
+    // ── Multi-file domains (Frontend, React, API, DevOps, Compose — anything with filesystem: true) ──
+    if (isMultiNow || c?.domain === "React" || c?.domain === "Frontend" || keys.includes("multi") || keys.includes("html") || keys.includes("App.jsx") || keys.includes("App.tsx") || keys.includes("jsx") || keys.includes("tsx")) {
       // Auto-detect preferred DB from starter_code keys (e.g. "js_mongodb" → "mongodb")
       const KNOWN_DBS = ["sqlite", "mongodb", "postgres", "mysql"];
       let inferredDb = selectedDb;
@@ -669,10 +676,12 @@ function EditorPage() {
         }
       }
 
-      // For API domain: default to "js" if not set yet, since api runtime is multi-file
-      const multiLang = runtimeEditorNow?.executionLanguage
-        || (keys.includes("multi") ? "multi" : keys.includes("html") ? "html"
-          : (c?.domain === "APIs" ? (lang === "py" ? "py" : lang === "go" ? "go" : "js") : lang));
+      // For React domain: default to "jsx" (or preserved lang if "jsx"/"tsx")
+      const multiLang = c?.domain === "React" || keys.includes("App.jsx") || keys.includes("App.tsx") || keys.includes("jsx") || keys.includes("tsx")
+        ? (["jsx", "tsx"].includes(lang) ? lang : "jsx")
+        : (runtimeEditorNow?.executionLanguage
+          || (keys.includes("multi") ? "multi" : keys.includes("html") ? "html"
+            : (c?.domain === "APIs" ? (lang === "py" ? "py" : lang === "go" ? "go" : "js") : lang)));
       setLang(multiLang);
       updateWorkspaceCode(multiLang, inferredDb);
       return;
@@ -779,7 +788,13 @@ function EditorPage() {
         setCode(JSON.stringify(parsedFiles));
         const keys = Object.keys(parsedFiles);
         if (keys.length > 0) {
-          setActiveFile(keys[0]);
+          if (targetLang === "tsx" && keys.includes("App.tsx")) {
+            setActiveFile("App.tsx");
+          } else if (targetLang === "jsx" && keys.includes("App.jsx")) {
+            setActiveFile("App.jsx");
+          } else if (!keys.includes(activeFile)) {
+            setActiveFile(keys[0]);
+          }
         }
       } else {
         setCode(starterRaw);
@@ -926,18 +941,21 @@ function EditorPage() {
           </div>
         </div>
         <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
-          {(!isMultiFileDomain || c?.domain === "APIs") && (
+          {(!isMultiFileDomain || c?.domain === "APIs" || c?.domain === "React") && (
             <Select value={lang} onValueChange={handleLangChange}>
             <SelectTrigger className="h-8 w-[150px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               {availableLangs.map((v) => {
-                let label = LANG_LABEL[v];
+                let label = LANG_LABEL[v] || v;
                 if (c?.domain === "APIs") {
                   if (v === "js") label = "Express.js (Node.js)";
                   if (v === "py") label = "FastAPI (Python)";
                   if (v === "go") label = "Gin (Go)";
+                } else if (c?.domain === "React") {
+                  if (v === "jsx") label = "React (JSX)";
+                  if (v === "tsx") label = "React (TSX)";
                 }
                 return (
                   <SelectItem key={v} value={v}>
@@ -1272,8 +1290,8 @@ function EditorPage() {
                   isMultiFileDomain
                     ? (activeFile || "").endsWith(".html") ? "html"
                       : (activeFile || "").endsWith(".css") ? "css"
-                      : (activeFile || "").endsWith(".js") ? "javascript"
-                      : (activeFile || "").endsWith(".ts") ? "typescript"
+                      : (activeFile || "").endsWith(".jsx") || (activeFile || "").endsWith(".js") ? "javascript"
+                      : (activeFile || "").endsWith(".tsx") || (activeFile || "").endsWith(".ts") ? "typescript"
                       : (activeFile || "").endsWith(".py") ? "python"
                       : (activeFile || "").endsWith(".go") ? "go"
                       : (activeFile || "").endsWith(".rs") ? "rust"
@@ -1283,8 +1301,8 @@ function EditorPage() {
                       : (activeFile || "").endsWith(".sql") ? "sql"
                       : (activeFile || "").endsWith(".json") ? "json"
                       : activeFile === "Dockerfile" ? "dockerfile"
-                      : "plaintext"
-                    : lang
+                      : (LANG_TO_MONACO[lang] || "javascript")
+                    : (LANG_TO_MONACO[lang] || lang)
                 }
                 onChange={handleCodeChange}
               />

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export const DOMAINS = ["Frontend", "Backend", "DevOps", "APIs", "Databases", "System Design"];
+export const DOMAINS = ["React", "Frontend", "APIs", "Databases", "DevOps", "Fullstack"];
 
 export const challenges = [
   {

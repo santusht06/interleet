@@ -132,10 +132,12 @@ function Dashboard() {
   // Map domainData dynamically from user.domains or backend ratings
   const domainData = useMemo(() => {
     return (activeUser?.domains || [
+      { domain: "React", score: activeUser?.react_rating || activeUser?.frontend_rating || 0 },
       { domain: "Frontend", score: activeUser?.frontend_rating || 0 },
-      { domain: "Backend", score: activeUser?.backend_rating || 0 },
-      { domain: "Fullstack", score: activeUser?.fullstack_rating || 0 },
+      { domain: "APIs", score: activeUser?.api_rating || 0 },
+      { domain: "Databases", score: activeUser?.database_rating || 0 },
       { domain: "DevOps", score: activeUser?.devops_rating || 0 },
+      { domain: "Fullstack", score: activeUser?.fullstack_rating || 0 },
     ]).map(d => ({
       domain: d.domain,
       score: d.score || d.rating || 0
@@ -270,11 +272,11 @@ function Dashboard() {
             accent="text-chart-3"
           />
           <StatCard
-            label="Backend"
-            value={activeUser.backend_rating || 0}
-            delta="Backend score"
+            label="React"
+            value={activeUser.react_rating || activeUser.frontend_rating || 0}
+            delta="React score"
             icon={Target}
-            accent="text-chart-4"
+            accent="text-cyan-400"
           />
         </div>
 

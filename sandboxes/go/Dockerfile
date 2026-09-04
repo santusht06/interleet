@@ -20,7 +20,7 @@ RUN go mod init warmup && \
     go get github.com/glebarez/go-sqlite && \
     go get github.com/lib/pq && \
     go get go.mongodb.org/mongo-driver/mongo && \
-    go get github.com/go-sql-driver/mysql && \
+    go get github.com/go-sql-driver/mysql@v1.8.1 && \
     cd / && rm -rf /tmp/warmup
 
 # Create a non-root judge user

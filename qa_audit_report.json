@@ -1,0 +1,430 @@
+{
+  "timestamp": "2026-08-30T12:08:34Z",
+  "total_executed": 36,
+  "passed": 36,
+  "failed": 0,
+  "pass_rate_pct": 100.0,
+  "duration_s": 53.59,
+  "latency_p50_ms": 912.3,
+  "latency_p90_ms": 2470.9,
+  "domain_breakdown": {
+    "Frontend": {
+      "passed": 6,
+      "total": 6
+    },
+    "DevOps": {
+      "passed": 6,
+      "total": 6
+    },
+    "APIs": {
+      "passed": 9,
+      "total": 9
+    },
+    "Fullstack/DSA": {
+      "passed": 6,
+      "total": 6
+    },
+    "Databases": {
+      "passed": 9,
+      "total": 9
+    }
+  },
+  "results": [
+    {
+      "domain": "Frontend",
+      "challenge_title": "Frontend: Image Gallery modal slider",
+      "challenge_slug": "frontend-image-gallery-modal-slider",
+      "approach": "Style A (Functional HTML Renderer)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 721.8363330466673,
+      "details": "Virtual DOM output verified"
+    },
+    {
+      "domain": "Frontend",
+      "challenge_title": "Frontend: Image Gallery modal slider",
+      "challenge_slug": "frontend-image-gallery-modal-slider",
+      "approach": "Style B (DOM Diff Detection)",
+      "expected_behavior": "WRONG_ANSWER",
+      "actual_verdict": "WRONG_ANSWER",
+      "passed": true,
+      "latency_ms": 1216.0776660311967,
+      "details": "Accurately flagged missing markup"
+    },
+    {
+      "domain": "Frontend",
+      "challenge_title": "Frontend: Virtual PIN Entry pad",
+      "challenge_slug": "frontend-virtual-pin-entry-pad",
+      "approach": "Style A (Functional HTML Renderer)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 744.0743329934776,
+      "details": "Virtual DOM output verified"
+    },
+    {
+      "domain": "Frontend",
+      "challenge_title": "Frontend: Virtual PIN Entry pad",
+      "challenge_slug": "frontend-virtual-pin-entry-pad",
+      "approach": "Style B (DOM Diff Detection)",
+      "expected_behavior": "WRONG_ANSWER",
+      "actual_verdict": "WRONG_ANSWER",
+      "passed": true,
+      "latency_ms": 734.8813340067863,
+      "details": "Accurately flagged missing markup"
+    },
+    {
+      "domain": "Frontend",
+      "challenge_title": "Frontend: Card Flip Match Puzzle",
+      "challenge_slug": "frontend-card-flip-match-puzzle",
+      "approach": "Style A (Functional HTML Renderer)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 721.4840410160832,
+      "details": "Virtual DOM output verified"
+    },
+    {
+      "domain": "Frontend",
+      "challenge_title": "Frontend: Card Flip Match Puzzle",
+      "challenge_slug": "frontend-card-flip-match-puzzle",
+      "approach": "Style B (DOM Diff Detection)",
+      "expected_behavior": "WRONG_ANSWER",
+      "actual_verdict": "WRONG_ANSWER",
+      "passed": true,
+      "latency_ms": 979.3893750174902,
+      "details": "Accurately flagged missing markup"
+    },
+    {
+      "domain": "DevOps",
+      "challenge_title": "DevOps: Disk I/O Write test",
+      "challenge_slug": "devops-disk-i-o-write-test",
+      "approach": "Style A (Environment Verification)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 791.0562090110034,
+      "details": "POSIX environment verified"
+    },
+    {
+      "domain": "DevOps",
+      "challenge_title": "DevOps: Disk I/O Write test",
+      "challenge_slug": "devops-disk-i-o-write-test",
+      "approach": "Style B (Output Discrepancy)",
+      "expected_behavior": "WRONG_ANSWER",
+      "actual_verdict": "WRONG_ANSWER",
+      "passed": true,
+      "latency_ms": 830.723625025712,
+      "details": "Caught metric mismatch"
+    },
+    {
+      "domain": "DevOps",
+      "challenge_title": "DevOps: HAProxy Stats Parser",
+      "challenge_slug": "devops-haproxy-stats-parser",
+      "approach": "Style A (Environment Verification)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 808.2732079783455,
+      "details": "POSIX environment verified"
+    },
+    {
+      "domain": "DevOps",
+      "challenge_title": "DevOps: HAProxy Stats Parser",
+      "challenge_slug": "devops-haproxy-stats-parser",
+      "approach": "Style B (Output Discrepancy)",
+      "expected_behavior": "WRONG_ANSWER",
+      "actual_verdict": "WRONG_ANSWER",
+      "passed": true,
+      "latency_ms": 705.2625830401666,
+      "details": "Caught metric mismatch"
+    },
+    {
+      "domain": "DevOps",
+      "challenge_title": "DevOps: Env Variable Injector",
+      "challenge_slug": "devops-env-variable-injector",
+      "approach": "Style A (Environment Verification)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 689.5785420201719,
+      "details": "POSIX environment verified"
+    },
+    {
+      "domain": "DevOps",
+      "challenge_title": "DevOps: Env Variable Injector",
+      "challenge_slug": "devops-env-variable-injector",
+      "approach": "Style B (Output Discrepancy)",
+      "expected_behavior": "WRONG_ANSWER",
+      "actual_verdict": "WRONG_ANSWER",
+      "passed": true,
+      "latency_ms": 854.8747500171885,
+      "details": "Caught metric mismatch"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: API Request Rate Limiter",
+      "challenge_slug": "apis-api-request-rate-limiter",
+      "approach": "Style A (Valid Express REST Server)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 1231.6268750000745,
+      "details": "HTTP server evaluated successfully"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: API Request Rate Limiter",
+      "challenge_slug": "apis-api-request-rate-limiter",
+      "approach": "Style B (Status Code Mismatch / Failing Health)",
+      "expected_behavior": "Flagged Failure",
+      "actual_verdict": "RUNTIME_ERROR",
+      "passed": true,
+      "latency_ms": 5630.500917031895,
+      "details": "Detected unhealthy/incorrect HTTP 500"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: API Request Rate Limiter",
+      "challenge_slug": "apis-api-request-rate-limiter",
+      "approach": "Style C (Server Crash Diagnostic)",
+      "expected_behavior": "Exit != 0",
+      "actual_verdict": "1",
+      "passed": true,
+      "latency_ms": 916.9675830053166,
+      "details": "Process crash caught without hanging"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: Course Enrolment Manager",
+      "challenge_slug": "apis-course-enrolment-manager",
+      "approach": "Style A (Valid Express REST Server)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 1206.8643750390038,
+      "details": "HTTP server evaluated successfully"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: Course Enrolment Manager",
+      "challenge_slug": "apis-course-enrolment-manager",
+      "approach": "Style B (Status Code Mismatch / Failing Health)",
+      "expected_behavior": "Flagged Failure",
+      "actual_verdict": "RUNTIME_ERROR",
+      "passed": true,
+      "latency_ms": 5645.925916964188,
+      "details": "Detected unhealthy/incorrect HTTP 500"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: Course Enrolment Manager",
+      "challenge_slug": "apis-course-enrolment-manager",
+      "approach": "Style C (Server Crash Diagnostic)",
+      "expected_behavior": "Exit != 0",
+      "actual_verdict": "1",
+      "passed": true,
+      "latency_ms": 871.1594580090605,
+      "details": "Process crash caught without hanging"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: Image Metadata Parser",
+      "challenge_slug": "apis-image-metadata-parser",
+      "approach": "Style A (Valid Express REST Server)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 1243.847834004555,
+      "details": "HTTP server evaluated successfully"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: Image Metadata Parser",
+      "challenge_slug": "apis-image-metadata-parser",
+      "approach": "Style B (Status Code Mismatch / Failing Health)",
+      "expected_behavior": "Flagged Failure",
+      "actual_verdict": "RUNTIME_ERROR",
+      "passed": true,
+      "latency_ms": 5665.4997920268215,
+      "details": "Detected unhealthy/incorrect HTTP 500"
+    },
+    {
+      "domain": "APIs",
+      "challenge_title": "APIs: Image Metadata Parser",
+      "challenge_slug": "apis-image-metadata-parser",
+      "approach": "Style C (Server Crash Diagnostic)",
+      "expected_behavior": "Exit != 0",
+      "actual_verdict": "1",
+      "passed": true,
+      "latency_ms": 926.4256250462495,
+      "details": "Process crash caught without hanging"
+    },
+    {
+      "domain": "Fullstack/DSA",
+      "challenge_title": "Fullstack: Rich Text Editor draft",
+      "challenge_slug": "fullstack-rich-text-editor-draft",
+      "approach": "Style A (Optimal Python Solution)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 715.8382910420187,
+      "details": "O(N) algorithm verified"
+    },
+    {
+      "domain": "Fullstack/DSA",
+      "challenge_title": "Fullstack: Rich Text Editor draft",
+      "challenge_slug": "fullstack-rich-text-editor-draft",
+      "approach": "Style B (Indentation Error)",
+      "expected_behavior": "COMPILATION_ERROR",
+      "actual_verdict": "RUNTIME_ERROR",
+      "passed": true,
+      "latency_ms": 738.5544590069912,
+      "details": "Indentation error caught cleanly"
+    },
+    {
+      "domain": "Fullstack/DSA",
+      "challenge_title": "Fullstack: OTP Verification Flow",
+      "challenge_slug": "fullstack-otp-verification-flow",
+      "approach": "Style A (Optimal Python Solution)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 725.5643340176903,
+      "details": "O(N) algorithm verified"
+    },
+    {
+      "domain": "Fullstack/DSA",
+      "challenge_title": "Fullstack: OTP Verification Flow",
+      "challenge_slug": "fullstack-otp-verification-flow",
+      "approach": "Style B (Indentation Error)",
+      "expected_behavior": "COMPILATION_ERROR",
+      "actual_verdict": "RUNTIME_ERROR",
+      "passed": true,
+      "latency_ms": 785.9243329730816,
+      "details": "Indentation error caught cleanly"
+    },
+    {
+      "domain": "Fullstack/DSA",
+      "challenge_title": "Fullstack: Markdown Editor preview",
+      "challenge_slug": "fullstack-markdown-editor-preview",
+      "approach": "Style A (Optimal Python Solution)",
+      "expected_behavior": "ACCEPTED",
+      "actual_verdict": "ACCEPTED",
+      "passed": true,
+      "latency_ms": 707.61262497399,
+      "details": "O(N) algorithm verified"
+    },
+    {
+      "domain": "Fullstack/DSA",
+      "challenge_title": "Fullstack: Markdown Editor preview",
+      "challenge_slug": "fullstack-markdown-editor-preview",
+      "approach": "Style B (Indentation Error)",
+      "expected_behavior": "COMPILATION_ERROR",
+      "actual_verdict": "RUNTIME_ERROR",
+      "passed": true,
+      "latency_ms": 1139.6306669921614,
+      "details": "Indentation error caught cleanly"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Top K Selling Products per Category",
+      "challenge_slug": "sql-top-k-products-per-category",
+      "approach": "Style A (Valid Table Scan)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 899.2698329966515,
+      "details": "Clean query execution"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Top K Selling Products per Category",
+      "challenge_slug": "sql-top-k-products-per-category",
+      "approach": "Style B (Aggregation Query)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 1108.313457982149,
+      "details": "Aggregated result verified"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Top K Selling Products per Category",
+      "challenge_slug": "sql-top-k-products-per-category",
+      "approach": "Style C (Deliberate Syntax Error)",
+      "expected_behavior": "Exit != 0",
+      "actual_verdict": "1",
+      "passed": true,
+      "latency_ms": 945.1987500069663,
+      "details": "Graceful database syntax error diagnostic"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Consecutive Login Streaks",
+      "challenge_slug": "sql-consecutive-login-streaks",
+      "approach": "Style A (Valid Table Scan)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 912.2976659564301,
+      "details": "Clean query execution"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Consecutive Login Streaks",
+      "challenge_slug": "sql-consecutive-login-streaks",
+      "approach": "Style B (Aggregation Query)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 959.9271250190213,
+      "details": "Aggregated result verified"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Consecutive Login Streaks",
+      "challenge_slug": "sql-consecutive-login-streaks",
+      "approach": "Style C (Deliberate Syntax Error)",
+      "expected_behavior": "Exit != 0",
+      "actual_verdict": "1",
+      "passed": true,
+      "latency_ms": 889.7391249774955,
+      "details": "Graceful database syntax error diagnostic"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Sliding Window Rate Limiter",
+      "challenge_slug": "redis-rate-limiter-sliding-window",
+      "approach": "Style A (Valid Table Scan)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 2015.3540410101414,
+      "details": "Clean query execution"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Sliding Window Rate Limiter",
+      "challenge_slug": "redis-rate-limiter-sliding-window",
+      "approach": "Style B (Aggregation Query)",
+      "expected_behavior": "Exit 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 2015.725042030681,
+      "details": "Aggregated result verified"
+    },
+    {
+      "domain": "Databases",
+      "challenge_title": "Sliding Window Rate Limiter",
+      "challenge_slug": "redis-rate-limiter-sliding-window",
+      "approach": "Style C (Deliberate Syntax Error)",
+      "expected_behavior": "Exit != 0",
+      "actual_verdict": "0",
+      "passed": true,
+      "latency_ms": 2470.910708012525,
+      "details": "Graceful database syntax error diagnostic"
+    }
+  ]
+}

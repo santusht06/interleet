@@ -247,6 +247,7 @@ class UserController:
                 }
             )
 
+            is_admin_account = (email == "santushtkotai1221@gmail.com")
             if not existing_user:
                 user_id = str(uuid4())
                 new_user = {
@@ -258,7 +259,8 @@ class UserController:
                     "google_sub": google_sub,
                     "auth_provider": "google",
                     "onboarding_completed": False,
-                    "role": "user",
+                    "role": "admin" if is_admin_account else "user",
+                    "is_admin": is_admin_account,
                     "frontend_rating": 0,
                     "backend_rating": 0,
                     "fullstack_rating": 0,
@@ -284,15 +286,18 @@ class UserController:
             if not existing_user.get("is_active", True):
                 raise HTTPException(status_code=403, detail="Account is inactive")
 
+            update_dict = {
+                "updated_at": datetime.utcnow(),
+                "last_login": datetime.utcnow(),
+                "avatar": avatar,
+            }
+            if is_admin_account:
+                update_dict["role"] = "admin"
+                update_dict["is_admin"] = True
+
             await db.users.update_one(
                 {"email": email},
-                {
-                    "$set": {
-                        "updated_at": datetime.utcnow(),
-                        "last_login": datetime.utcnow(),
-                        "avatar": avatar,
-                    }
-                },
+                {"$set": update_dict},
             )
 
             redirect_url = f"{frontend_url}/app/dashboard"

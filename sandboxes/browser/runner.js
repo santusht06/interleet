@@ -54,6 +54,18 @@ async function main() {
     // 2. Start Static Server on dynamic port
     const app = express();
     app.get('/favicon.ico', (req, res) => res.status(204).end());
+
+    // Serve local offline React & Babel vendor bundles
+    app.get('/vendor/react.development.js', (req, res) => {
+        res.sendFile(path.join(__dirname, 'node_modules/react/umd/react.development.js'));
+    });
+    app.get('/vendor/react-dom.development.js', (req, res) => {
+        res.sendFile(path.join(__dirname, 'node_modules/react-dom/umd/react-dom.development.js'));
+    });
+    app.get('/vendor/babel.min.js', (req, res) => {
+        res.sendFile(path.join(__dirname, 'node_modules/@babel/standalone/babel.min.js'));
+    });
+
     app.use(express.static(WORKSPACE_DIR));
     
     const server = await new Promise((resolve) => {
@@ -125,6 +137,10 @@ async function main() {
         // 4. Navigate
         const entryUrl = `${baseUrl}/${config.entry}`;
         await page.goto(entryUrl, { waitUntil: 'load', timeout: config.timeout });
+
+        // Wait for React to compile & mount if #root exists
+        await page.waitForSelector('#root > *', { timeout: 1500 }).catch(() => {});
+        await page.waitForTimeout(50);
 
         // Extract Performance (basic)
         const perfTiming = JSON.parse(await page.evaluate(() => JSON.stringify(window.performance.timing)));

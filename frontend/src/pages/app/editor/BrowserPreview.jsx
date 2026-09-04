@@ -186,32 +186,129 @@ function compileFrontendCode(code, slug, title) {
   if (!code) return getFrontendSrcDoc(slug, title);
   try {
     const files = JSON.parse(code);
-    if (files && typeof files === "object" && "index.html" in files) {
-      let html = files["index.html"] || "";
-      const css = files["index.css"] || "";
-      const js = files["index.js"] || "";
+    if (files && typeof files === "object") {
+      // Check for React component files
+      const isReact = "App.jsx" in files || "App.js" in files || "App.tsx" in files || "index.jsx" in files;
+      if (isReact) {
+        const cleanJsx = (s) => {
+          if (!s) return "";
+          return s
+            .replace(/import\s+(?:React\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)?\s+from\s+['"][^'"]+['"];?/g, "")
+            .replace(/import\s+['"][^'"]+['"];?/g, "")
+            .replace(/export\s+default\s+function\b/g, "function")
+            .replace(/export\s+default\s+/g, "")
+            .replace(/export\s+(const|function|let|var|class)\b/g, "$1");
+        };
 
-      // Strip external stylesheet links and script tags for index.css/index.js to prevent 404 resource requests
-      html = html.replace(/<link[^>]*href=["']\/?index\.css["'][^>]*>/gi, "");
-      html = html.replace(/<script[^>]*src=["']\/?index\.js["'][^>]*><\/script>/gi, "");
+        const appCode = cleanJsx(files["App.jsx"] || files["App.js"] || files["App.tsx"] || files["index.jsx"] || "");
+        const css = files["index.css"] || files["App.css"] || files["styles.css"] || "";
+        const extraComponents = Object.entries(files)
+          .filter(([k]) => !["App.jsx", "App.js", "App.tsx", "index.jsx", "index.css", "App.css", "styles.css", "index.html"].includes(k) && k.endsWith(".jsx"))
+          .map(([fname, content]) => `// File: ${fname}\n${cleanJsx(content)}`)
+          .join("\n\n");
 
-      // Inject css
-      const styleTag = `<style>\n${css}\n</style>`;
-      if (html.includes("</head>")) {
-        html = html.replace("</head>", `${CONSOLE_INTERCEPTOR}\n${styleTag}\n</head>`);
-      } else {
-        html = `${CONSOLE_INTERCEPTOR}\n${styleTag}\n${html}`;
+        return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  ${CONSOLE_INTERCEPTOR}
+  <style>
+    :root { color-scheme: light dark; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; background: #09090b; color: #f4f4f5; padding: 16px; }
+    ${css}
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script id="user-source" type="text/plain">
+    const { useState, useEffect, useRef, useMemo, useCallback, useContext, createContext, useReducer, useId, useTransition, useDeferredValue } = React;
+
+    ${extraComponents}
+
+    ${appCode}
+
+    try {
+      const rootEl = document.getElementById('root');
+      if (rootEl && typeof ReactDOM !== 'undefined') {
+        const root = ReactDOM.createRoot(rootEl);
+        const Component = typeof App !== 'undefined' ? App : (typeof window.App !== 'undefined' ? window.App : null);
+        if (Component) {
+          root.render(React.createElement(Component));
+        }
+      }
+    } catch(err) {
+      console.error("React Render Error:", err);
+    }
+  </script>
+  <script>
+    function renderReact() {
+      if (typeof Babel === 'undefined' || typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+        setTimeout(renderReact, 20);
+        return;
+      }
+      try {
+        const srcEl = document.getElementById('user-source');
+        if (!srcEl) return;
+        const src = srcEl.textContent;
+        const res = Babel.transform(src, {
+          filename: 'App.tsx',
+          presets: ['react', 'typescript']
+        }).code;
+        const s = document.createElement('script');
+        s.textContent = res;
+        document.body.appendChild(s);
+      } catch(err) {
+        console.error("React Transpilation Error:", err);
+        const rootEl = document.getElementById('root');
+        if (rootEl) {
+          rootEl.innerHTML = '<div style="color:#ef4444;background:#18181b;padding:16px;border-radius:8px;font-family:monospace;font-size:13px;border:1px solid #7f1d1d;margin:16px;"><strong>Preview Error:</strong><pre style="white-space:pre-wrap;margin-top:8px;color:#fca5a5;">' + (err.message || err) + '</pre></div>';
+        }
+      }
+    }
+
+    if (document.readyState === 'complete') {
+      renderReact();
+    } else {
+      window.addEventListener('load', renderReact);
+      setTimeout(renderReact, 50);
+    }
+  </script>
+</body>
+</html>`;
       }
 
-      // Inject js
-      const scriptTag = `<script>\n${js}\n</script>`;
-      if (html.includes("</body>")) {
-        html = html.replace("</body>", `${scriptTag}\n</body>`);
-      } else {
-        html = `${html}\n${scriptTag}`;
-      }
+      if ("index.html" in files) {
+        let html = files["index.html"] || "";
+        const css = files["index.css"] || "";
+        const js = files["index.js"] || "";
 
-      return html;
+        // Strip external stylesheet links and script tags for index.css/index.js to prevent 404 resource requests
+        html = html.replace(/<link[^>]*href=["']\/?index\.css["'][^>]*>/gi, "");
+        html = html.replace(/<script[^>]*src=["']\/?index\.js["'][^>]*><\/script>/gi, "");
+
+        // Inject css
+        const styleTag = `<style>\n${css}\n</style>`;
+        if (html.includes("</head>")) {
+          html = html.replace("</head>", `${CONSOLE_INTERCEPTOR}\n${styleTag}\n</head>`);
+        } else {
+          html = `${CONSOLE_INTERCEPTOR}\n${styleTag}\n${html}`;
+        }
+
+        // Inject js
+        const scriptTag = `<script>\n${js}\n</script>`;
+        if (html.includes("</body>")) {
+          html = html.replace("</body>", `${scriptTag}\n</body>`);
+        } else {
+          html = `${html}\n${scriptTag}`;
+        }
+
+        return html;
+      }
     }
   } catch (e) {}
 
@@ -220,7 +317,7 @@ function compileFrontendCode(code, slug, title) {
 
 // ─── BrowserPreview Component ───────────────────────────────────────────────
 
-const FRONTEND_DOMAINS = new Set(["Frontend"]);
+const FRONTEND_DOMAINS = new Set(["Frontend", "React"]);
 
 const PreviewArea = memo(function PreviewArea({ domain, slug, title, code, execState, isMultiFileDomain, onConsoleLog }) {
   const iframeRef = useRef(null);
@@ -243,7 +340,7 @@ const PreviewArea = memo(function PreviewArea({ domain, slug, title, code, execS
           ref={iframeRef}
           title={`${title} preview`}
           srcDoc={compileFrontendCode(code, slug, title)}
-          sandbox="allow-scripts"
+          sandbox="allow-scripts allow-same-origin allow-modals allow-popups"
           className="h-full w-full flex-1 border-0 bg-white"
         />
       </div>

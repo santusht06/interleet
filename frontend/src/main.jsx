@@ -21,17 +21,24 @@ import { Provider } from "react-redux";
 import { store } from "@/redux";
 
 import AppInitializer from "@/components/layout/AppInitializer";
+import { RootErrorBoundary } from "@/components/common/RootErrorBoundary";
+import { initSentry } from "@/lib/sentry";
 
 import { Toaster } from "@/components/ui/sonner";
 
 import "@/styles.css";
 
+// Initialize production error monitoring
+initSentry();
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Provider store={store}>
-      <AppInitializer />
+    <RootErrorBoundary>
+      <Provider store={store}>
+        <AppInitializer />
 
-      <Toaster />
-    </Provider>
+        <Toaster />
+      </Provider>
+    </RootErrorBoundary>
   </StrictMode>,
 );

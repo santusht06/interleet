@@ -26,12 +26,12 @@ const difficultyStyles = {
 };
 
 const domainColors = {
+  React: "text-cyan-400",
   Frontend: "text-chart-1",
-  Backend: "text-chart-2",
   DevOps: "text-chart-3",
   APIs: "text-chart-4",
   Databases: "text-chart-5",
-  "System Design": "text-primary"
+  Fullstack: "text-chart-2"
 };
 
 export function DifficultyPill({ d, className }) {

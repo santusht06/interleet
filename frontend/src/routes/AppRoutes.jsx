@@ -17,6 +17,7 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import { ProtectedRoute, PublicRoute, OnboardingRoute } from "@/routes/RouteGuards";
+import { RouteErrorBoundary } from "@/components/common/RootErrorBoundary";
 
 // Public / marketing
 import IndexPage from "@/pages/index";
@@ -71,7 +72,10 @@ function ProfileRedirect() {
 }
 
 export const router = createBrowserRouter([
-  // ── Fully public (no auth needed, no redirect) ───────────────────────────
+  {
+    errorElement: <RouteErrorBoundary />,
+    children: [
+      // ── Fully public (no auth needed, no redirect) ───────────────────────────
   {
     path: "/",
     element: <IndexPage />,
@@ -174,5 +178,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     element: <NotFoundPage />,
+  },
+    ],
   },
 ]);

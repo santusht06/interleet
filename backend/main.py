@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Interleet — FastAPI Application Entry Point
-Self-hosted multi-language online judge engine + interview platform.
-"""
-
 from __future__ import annotations
 
 import logging
@@ -61,7 +56,6 @@ from app.routers.validation import router as validation_router
 from app.routers.settings import router as settings_router
 
 
-# ─── Judge Engine ──────────────────────────────────────────────────
 from app.api.v1.execute import engine_router
 from app.engine.websocket.router import ws_router
 from app.engine.workers.startup import start_workers, stop_workers
@@ -69,7 +63,6 @@ from app.engine.docker.pool import verify_sandbox_images
 
 logger = logging.getLogger(__name__)
 
-# ─── Lifespan: startup + shutdown ─────────────────────────────────
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

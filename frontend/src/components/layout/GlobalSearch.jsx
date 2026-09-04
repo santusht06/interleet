@@ -70,14 +70,12 @@ export function GlobalSearch() {
   const [dbUsers, setDbUsers] = useState([]);
   const [dbChallenges, setDbChallenges] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  // Infinite scroll pagination state
   const [challengePage, setChallengePage] = useState(1);
   const [hasMoreChallenges, setHasMoreChallenges] = useState(false);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
   const sentinelRef = useRef(null);
   const PAGE_LIMIT = 8;
 
-  // Load recent searches on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem("interleet_recent_searches");
@@ -89,7 +87,7 @@ export function GlobalSearch() {
     }
   }, []);
 
-  // Save recent search helper
+
   const addRecentSearch = (item) => {
     const term = item.title || item.label || item.username;
     if (!term) return;
@@ -103,7 +101,6 @@ export function GlobalSearch() {
     }
   };
 
-  // Keyboard shortcut CMD+K / CTRL+K to open
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -115,7 +112,6 @@ export function GlobalSearch() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Auto-focus input when modal opens
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {

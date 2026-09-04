@@ -39,31 +39,124 @@ class BrowserExecutor(BaseExecutor):
         css_content = ""
         js_content = ""
 
+        # Detect React JSX files
+        is_react = False
+        app_jsx = ""
+        extra_files = {}
+
         try:
             # Check if code is a JSON string of multiple files (e.g. from editor)
             data = json.loads(code)
             if isinstance(data, dict):
                 html_content = data.get("index.html", "")
-                css_content = data.get("index.css", "")
+                css_content = data.get("index.css", data.get("App.css", data.get("styles.css", "")))
                 js_content = data.get("index.js", "")
+                
+                # Check for React entries
+                for k in ["App.jsx", "App.js", "App.tsx", "index.jsx"]:
+                    if k in data:
+                        is_react = True
+                        app_jsx = data[k]
+                        break
+                
+                for k, v in data.items():
+                    if k not in ["index.html", "index.css", "index.js", "App.jsx", "App.js", "App.tsx", "index.jsx"]:
+                        extra_files[k] = v
             else:
                 html_content = code
         except Exception:
             # Fallback for plain text single file
             html_content = code
 
-        # Ensure index.css and index.js are linked in HTML if missing
-        if "index.css" not in html_content:
-            if "</head>" in html_content:
-                html_content = html_content.replace("</head>", "  <link rel=\"stylesheet\" href=\"index.css\">\n</head>")
-            else:
-                html_content = "<link rel=\"stylesheet\" href=\"index.css\">\n" + html_content
+        if not is_react and ("import React" in html_content or "from 'react'" in html_content or "useState(" in html_content):
+            is_react = True
+            app_jsx = html_content
 
-        if "index.js" not in html_content:
-            if "</body>" in html_content:
-                html_content = html_content.replace("</body>", "  <script src=\"index.js\"></script>\n</body>")
-            else:
-                html_content = html_content + "\n<script src=\"index.js\"></script>"
+        if is_react:
+            import re
+
+            def clean_jsx(s: str) -> str:
+                # Remove import statements
+                s = re.sub(r'import\s+(?:React\s*,\s*)?(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)?\s+from\s+[\'"][^\'"]+[\'"];?', '', s)
+                s = re.sub(r'import\s+[\'"][^\'"]+[\'"];?', '', s)
+                # Strip export keywords so components remain in script scope
+                s = re.sub(r'export\s+default\s+function\b', 'function', s)
+                s = re.sub(r'export\s+default\s+', '', s)
+                s = re.sub(r'export\s+(const|function|let|var|class)\b', r'\1', s)
+                return s
+
+            clean_app_jsx = clean_jsx(app_jsx)
+            extra_components_script = "\n\n".join([
+                f"// --- File: {fname} ---\n{clean_jsx(fcontent)}"
+                for fname, fcontent in extra_files.items()
+                if fname.endswith((".jsx", ".js", ".tsx"))
+            ])
+
+            html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="index.css" />
+  <script src="/vendor/react.development.js"></script>
+  <script src="/vendor/react-dom.development.js"></script>
+  <script src="/vendor/babel.min.js"></script>
+  <style>
+    :root {{ color-scheme: light dark; }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif; }}
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script id="user-source" type="text/plain">
+    const {{ useState, useEffect, useRef, useMemo, useCallback, useContext, createContext, useReducer, useId, useTransition, useDeferredValue }} = React;
+
+    {extra_components_script}
+
+    {clean_app_jsx}
+
+    // Auto mount to root
+    const rootEl = document.getElementById('root');
+    if (rootEl && typeof ReactDOM !== 'undefined') {{
+      const root = ReactDOM.createRoot(rootEl);
+      const Component = typeof App !== 'undefined' ? App : (typeof window.App !== 'undefined' ? window.App : null);
+      if (Component) {{
+        root.render(React.createElement(Component));
+      }}
+    }}
+  </script>
+  <script>
+    (function() {{
+      try {{
+        const src = document.getElementById('user-source').textContent;
+        const res = Babel.transform(src, {{
+          filename: 'App.tsx',
+          presets: ['react', 'typescript']
+        }}).code;
+        const s = document.createElement('script');
+        s.textContent = res;
+        document.body.appendChild(s);
+      }} catch(err) {{
+        console.error("React Transpilation Error:", err);
+      }}
+    }})();
+  </script>
+</body>
+</html>"""
+        else:
+            # Ensure index.css and index.js are linked in HTML if missing
+            if "index.css" not in html_content:
+                if "</head>" in html_content:
+                    html_content = html_content.replace("</head>", "  <link rel=\"stylesheet\" href=\"index.css\">\n</head>")
+                else:
+                    html_content = "<link rel=\"stylesheet\" href=\"index.css\">\n" + html_content
+
+            if "index.js" not in html_content:
+                if "</body>" in html_content:
+                    html_content = html_content.replace("</body>", "  <script src=\"index.js\"></script>\n</body>")
+                else:
+                    html_content = html_content + "\n<script src=\"index.js\"></script>"
 
         # Write index.html
         async with aiofiles.open(workspace / "index.html", "w", encoding="utf-8") as f:
@@ -79,6 +172,12 @@ class BrowserExecutor(BaseExecutor):
         async with aiofiles.open(workspace / "index.js", "w", encoding="utf-8") as f:
             await f.write(js_content)
         (workspace / "index.js").chmod(0o644)
+
+        # Write any extra files
+        for fname, fcontent in extra_files.items():
+            async with aiofiles.open(workspace / fname, "w", encoding="utf-8") as f:
+                await f.write(fcontent)
+            (workspace / fname).chmod(0o644)
 
         # Build runtime.json configuration
         evaluationScript = """

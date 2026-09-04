@@ -31,6 +31,22 @@ function loadMonaco() {
         paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/min/vs" },
       });
       window.require(["vs/editor/editor.main"], (monaco) => {
+        try {
+          if (monaco.languages?.typescript) {
+            monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+              target: monaco.languages.typescript.ScriptTarget?.Latest ?? 99,
+              allowNonTsExtensions: true,
+              jsx: monaco.languages.typescript.JsxEmit?.React ?? 2,
+              allowJs: true,
+            });
+            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+              target: monaco.languages.typescript.ScriptTarget?.Latest ?? 99,
+              allowNonTsExtensions: true,
+              jsx: monaco.languages.typescript.JsxEmit?.React ?? 2,
+              allowJs: true,
+            });
+          }
+        } catch (_) {}
         window.monaco = monaco;
         window.__monacoReady = true;
         resolve(monaco);

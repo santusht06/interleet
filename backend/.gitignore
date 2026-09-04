@@ -12,4 +12,9 @@ google.json
 
 # OR specifically
 app/core/security/private.pem
-app/core/security/public.pemgoogle.json
+app/core/security/public.pem
+
+# PII / data exports — never commit
+sent_emails.txt
+candidates_info.csv
+candidates_info.json

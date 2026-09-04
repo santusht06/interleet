@@ -19,6 +19,7 @@ from datetime import datetime, timedelta
 import httpx
 from fastapi import HTTPException
 from app.core.db import get_db
+from app.core.config import PROJECT_ENVIRONMENT
 
 db = get_db()
 
@@ -34,6 +35,10 @@ class PaymentController:
 
         # 1. Determine if real Razorpay keys are configured
         is_mock_mode = not RAZORPAY_KEY_ID or not RAZORPAY_KEY_SECRET or RAZORPAY_KEY_ID.startswith("rzp_test_mock")
+
+        # Never allow mock (free-premium) orders in production.
+        if is_mock_mode and PROJECT_ENVIRONMENT == "PRODUCTION":
+            raise HTTPException(status_code=503, detail="Payment provider is not configured.")
 
         if is_mock_mode:
             import uuid
@@ -141,7 +146,9 @@ class PaymentController:
         verified = False
 
         if is_mock_order:
-            # For mock order, signature verify is bypass/mock validation, but still verify that order ID starts with order_mock_
+            # Mock orders bypass signature verification — never allowed in production.
+            if PROJECT_ENVIRONMENT == "PRODUCTION":
+                raise HTTPException(status_code=400, detail="Mock payments are disabled in production.")
             if order_id.startswith("order_mock_"):
                 verified = True
         else:

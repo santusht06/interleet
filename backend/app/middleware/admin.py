@@ -14,12 +14,15 @@
 
 from fastapi import Request, HTTPException
 from app.middleware.user import Middleware as UserMiddleware
+from app.core.config import ADMIN_EMAILS
 
 class AdminMiddleware:
     @staticmethod
     async def is_admin(request: Request):
         user_auth = await UserMiddleware.me(request)
         user = user_auth.get("user")
-        if not user or user.get("email") != "santushtkotai1221@gmail.com" or user.get("role") != "admin":
+        email = (user or {}).get("email", "").strip().lower()
+        # Require the admin role, and (when an allowlist is configured) membership in it.
+        if not user or user.get("role") != "admin" or (ADMIN_EMAILS and email not in ADMIN_EMAILS):
             raise HTTPException(status_code=403, detail="Access denied. Admin access only.")
         return user

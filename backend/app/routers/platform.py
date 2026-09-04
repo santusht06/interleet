@@ -16,6 +16,7 @@ from fastapi import APIRouter, Body, Query, Depends
 
 from app.controllers.platform import PlatformController
 from app.middleware.user import Middleware as UserMiddleware
+from app.middleware.admin import AdminMiddleware
 
 router = APIRouter(prefix="/api", tags=["Platform"])
 
@@ -36,7 +37,7 @@ async def list_challenges(
 
 
 @router.post("/challenges")
-async def create_challenge(payload: dict = Body(...)):
+async def create_challenge(payload: dict = Body(...), admin=Depends(AdminMiddleware.is_admin)):
     return await PlatformController.create_challenge(payload)
 
 
@@ -78,17 +79,17 @@ async def unfollow_user(username: str, user_auth=Depends(UserMiddleware.me)):
 
 
 @router.get("/profile/{username}/ai-evaluation")
-async def profile_ai_evaluation(username: str, force: bool = False):
+async def profile_ai_evaluation(username: str, force: bool = False, user_auth=Depends(UserMiddleware.me)):
     return await PlatformController.ai_evaluation(username=username, force_refresh=force)
 
 
 @router.get("/activity")
-async def activity():
+async def activity(user=Depends(UserMiddleware.me)):
     return await PlatformController.activity()
 
 
 @router.get("/interviews")
-async def interviews():
+async def interviews(user=Depends(UserMiddleware.me)):
     return await PlatformController.interviews()
 
 
@@ -118,6 +119,9 @@ async def save_system_design_canvas(payload: dict = Body(...), user=Depends(User
 
 @router.get("/candidates")
 async def candidates():
+    # Public recruiter talent directory — consumed by the public /recruiter page.
+    # Returns user profile cards (name, rating, top domain, location, skill scores)
+    # from the users collection; NOT the candidates_info lead export. Public by design.
     return await PlatformController.candidates()
 
 

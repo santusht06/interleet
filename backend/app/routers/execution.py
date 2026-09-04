@@ -33,7 +33,10 @@ router = APIRouter(prefix="/api/execution", tags=["Code Execution (Legacy)"])
 
 
 @router.post("/run", summary="Run code (legacy route)")
-async def run_code(payload: ExecuteRequest = Body(...)):
+async def run_code(
+    payload: ExecuteRequest = Body(...),
+    user_auth=Depends(UserMiddleware.me),
+):
     """
     Legacy run endpoint — proxied to the new Docker-based engine.
     Prefer: POST /api/v1/execute

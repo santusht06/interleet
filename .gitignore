@@ -16,6 +16,14 @@ env/
 .env
 .env.*
 !.env.example
+
+# =========================
+# PII / data exports (NEVER commit)
+# =========================
+candidates_info.csv
+candidates_info.json
+sent_emails.txt
+backend/sent_emails.txt
 # =========================
 # macOS
 # =========================

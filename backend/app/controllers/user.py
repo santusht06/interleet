@@ -15,11 +15,12 @@
 from fastapi import HTTPException, Response, Request
 from datetime import datetime
 from uuid import uuid4
+import hmac
 import logging
 from app.models.users import UserModel as User
 from app.models.users import OTPverify as OTP
 from app.core.db import get_db
-from app.core.config import PROJECT_ENVIRONMENT, FRONTEND_URL, BACKEND_URL
+from app.core.config import PROJECT_ENVIRONMENT, FRONTEND_URL, BACKEND_URL, ADMIN_EMAILS, ADMIN_LOGIN_CODE
 
 def _is_local_dev(request):
     """Check if the request is coming from local development."""
@@ -551,7 +552,11 @@ class UserController:
             if not email or not code:
                 raise HTTPException(status_code=400, detail="Email and special code are required")
 
-            if email != "santushtkotai1221@gmail.com" or code != "6969":
+            # Admin access is gated by an env-configured allowlist + login code.
+            # Fails closed if not configured (no hardcoded backdoor).
+            if not ADMIN_EMAILS or not ADMIN_LOGIN_CODE:
+                raise HTTPException(status_code=503, detail="Admin login is not configured")
+            if email.strip().lower() not in ADMIN_EMAILS or not hmac.compare_digest(str(code), ADMIN_LOGIN_CODE):
                 raise HTTPException(status_code=403, detail="Invalid admin email or special code")
 
             existing_user = await db.users.find_one({"email": email})

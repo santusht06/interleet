@@ -36,7 +36,7 @@ load_dotenv(override=True)
 if _preserved_port is not None:
     os.environ["SERVER_PORT"] = _preserved_port
 
-from app.core.config import SESSION_SECRET_KEY
+from app.core.config import SESSION_SECRET_KEY, PROJECT_ENVIRONMENT
 from app.core.db import get_db
 
 # ─── Existing routers ──────────────────────────────────────────────
@@ -138,11 +138,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_IS_PROD = PROJECT_ENVIRONMENT == "PRODUCTION"
+if _IS_PROD and not SESSION_SECRET_KEY:
+    raise RuntimeError("SESSION_SECRET_KEY must be set in production")
+
 app.add_middleware(
     SessionMiddleware,
-    secret_key=SESSION_SECRET_KEY or "fallback-session-secret",
+    secret_key=SESSION_SECRET_KEY or "dev-only-insecure-session-secret",
     same_site="lax",
-    https_only=False,
+    https_only=_IS_PROD,
 )
 
 
